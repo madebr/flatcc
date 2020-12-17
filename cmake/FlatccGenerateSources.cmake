@@ -1,22 +1,36 @@
-# Use the following function to generate C source files from flatbuffer definition files:
-#
-# function signature:
+# Use `flatcc_generate_sources` to generate C source files from flatbuffer definition files.
+# The sources will be generated at build time, and only if some target has the output target
+# as a dependency or adds the generated sources.
 #
 #   flatcc_generate_sources(
+#      <name>
 #      DEFINITION_FILES <flatbuffer-definition-file> [<flatbuffer-definition-file> [...]]
 #      [OUTPUT_DIR <output-directory>]
 #      [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
 #      [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
-#      [OUTFILE <output-file>] [PREFIX <prefix>] [TARGET <target-name>]
+#      [OUTFILE <output-file>] [PREFIX <prefix>]
 #      [PATHS <include-path> [<include-path> [...]]]
 #      [COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]]
 #   )
 #
-# arguments:
+# The following things are returned:
 #
-#   OUTPUT_DIR <output-directory>
+#   <name>_GENERATED_SOURCES
 #
-#     All generated sources will be written in the `output-directory` folder.
+#     Variable containing a list of all generated sources.
+#     This variable can be added to `add_library`/`add_executable`.
+#
+#   flatcc_generated::<name>
+#
+#     Target that contains all headers. Users must link to it.
+#     When linking to it, the headers will be generated.
+#     The folder containing these headers will also be added to the include path.
+#
+# Required arguments:
+#
+#   <name>
+#
+#     Unique name. It is used for output variable(s) and target(s).
 #
 #   DEFINITION_FILES <definition-file> [<definition-file> [...]]
 #
@@ -24,6 +38,12 @@
 #     This function also track included files, so it is not needed to list all dependent files here.
 #     Because the search for included files happens at configure time,
 #     the definition files must be available before calling this function.
+#
+# Optional arguments:
+#
+#   OUTPUT_DIR <output-directory>
+#
+#     All generated sources will be written in the `output-directory` folder.
 #
 #   ALL
 #   SCHEMA
@@ -65,14 +85,12 @@
 #     Add extra arguments to flatcc.
 #
 
-# With cross-compiling you should provide the directory where the flatcc compiler executable is located
-# in environment variable FLATCC_BUILD_BIN_PATH. If you use Conan and add flatcc as a build requirement
-# this will be done automatically.
+cmake_minimum_required(VERSION 3.1)
 
 # TODO: not needed when cmake_minimum_required_version >= 3.4
 include(CMakeParseArguments)
 
-function(flatcc_generate_sources)
+function(flatcc_generate_sources NAME)
     # parse function arguments
     set(output_options SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
@@ -184,11 +202,12 @@ function(flatcc_generate_sources)
     endif()
     if (FLATCC_ALL)
         list(APPEND FLATCC_COMPILE_FLAGS -a)
-        set(FLATCC_READER ON)
         set(FLATCC_COMMON_BUILDER ON)
         set(FLATCC_COMMON_READER ON)
         set(FLATCC_BUILDER ON)
         set(FLATCC_VERIFIER ON)
+        set(FLATCC_READER ON)
+        set(FLATCC_RECURSIVE ON)
     endif()
 
     # Calculate suffixes of output files.
@@ -290,15 +309,17 @@ function(flatcc_generate_sources)
         message(VERBOSE "----- flatcc info end -----")
     endif()
 
+    file(MAKE_DIRECTORY "${FLATCC_OUTPUT_DIR}")
+
     add_custom_command(OUTPUT ${OUTPUT_FILES}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${FLATCC_OUTPUT_DIR}"
         COMMAND flatcc::cli ${FLATCC_COMPILE_FLAGS} ${ABSOLUTE_DEFINITION_FILES}
         DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
-    if(FLATCC_TARGET)
-        # TODO: possible improvement if cmake_minimum_required_version >= 3.1:
-        #        use add_library(... INTERFACE) +  add_custom_command + target_sources(INTERFACE) + target_link_libraries()
-        add_custom_target("${FLATCC_TARGET}" DEPENDS ${OUTPUT_FILES})
-    endif()
+    add_library("_flatcc_generated_${NAME}" INTERFACE)
+    target_sources("_flatcc_generated_${NAME}" INTERFACE ${OUTPUT_FILES})
+    target_include_directories("_flatcc_generated_${NAME}" INTERFACE "${FLATCC_OUTPUT_DIR}")
 
+    add_library("flatcc_generated::${NAME}" ALIAS "_flatcc_generated_${NAME}")
+    set("${NAME}_GENERATED_SOURCES" ${OUTPUT_FILES} PARENT_SCOPE)
 endfunction()

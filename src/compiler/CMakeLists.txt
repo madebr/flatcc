@@ -1,8 +1,3 @@
-include_directories (
-    "${PROJECT_SOURCE_DIR}/external"
-    "${PROJECT_SOURCE_DIR}/config"
-)
-
 set (SOURCES
     ${PROJECT_SOURCE_DIR}/external/hash/cmetrohash64.c
     ${PROJECT_SOURCE_DIR}/external/hash/str_set.c
@@ -32,15 +27,22 @@ set (SOURCES
 )
 
 if (FLATCC_REFLECTION)
-    set (SOURCES ${SOURCES} codegen_schema.c)
+    list(APPEND SOURCES codegen_schema.c)
 endif(FLATCC_REFLECTION)
 
 add_library(flatcc ${SOURCES})
-add_library(flatcc::libflatcc ALIAS flatcc)
+add_library(flatcc::compiler ALIAS flatcc)
 
-target_include_directories(flatcc PUBLIC $<INSTALL_INTERFACE:include> $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+target_include_directories(flatcc
+    PUBLIC
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        "${PROJECT_SOURCE_DIR}/external"
+        "${PROJECT_SOURCE_DIR}/config"
+)
 
-set_target_properties(flatcc PROPERTIES EXPORT_NAME libflatcc)
+set_target_properties(flatcc PROPERTIES EXPORT_NAME compiler)
 
 if (FLATCC_INSTALL)
     install(TARGETS flatcc EXPORT flatcc_exports DESTINATION ${lib_dir})

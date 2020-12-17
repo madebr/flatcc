@@ -10,12 +10,10 @@
 set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(FBS_DIR "${PROJECT_SOURCE_DIR}/samples/monster")
 
-include_directories("${GEN_DIR}")
+flatcc_generate_sources(reflection_sample DEFINITION_FILES "${FBS_DIR}/monster.fbs" SCHEMA OUTPUT_DIR "${GEN_DIR}")
 
-flatcc_generate_sources(SCHEMA OUTPUT_DIR "${GEN_DIR}" DEFINITION_FILES "${FBS_DIR}/monster.fbs")
-
-add_executable(bfbs2json bfbs2json.c "${GEN_DIR}/monster.bfbs")
-target_link_libraries(bfbs2json flatcc::runtime)
+add_executable(bfbs2json bfbs2json.c)
+target_link_libraries(bfbs2json PRIVATE flatcc::runtime flatcc_generated::reflection_sample)
 
 if (FLATCC_TEST)
     add_test(NAME bfbs2json COMMAND bfbs2json "${GEN_DIR}/monster.bfbs")

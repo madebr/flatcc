@@ -3,13 +3,13 @@ add_executable(cgen_test
 )
 
 target_link_libraries(cgen_test
-    flatcc::libflatcc
+    flatcc::compiler
 )
 
 add_test(NAME cgen_test COMMAND cgen_test)
 
 
-if(CMAKE_VERSION VERSION_LESS 3.2)
+if(CMAKE_VERSION VERSION_LESS 3.10)
     message(WARNING "generator test disabled due to old cmake version")
 else()
     # TODO: the use of generator expressions requires cmake versions 3.2

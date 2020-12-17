@@ -1,7 +1,7 @@
 set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(FBS_DIR "${PROJECT_SOURCE_DIR}/test/monster_test")
 
-include_directories("${GEN_DIR}")
+# Don't use flatcc_generate_sources to test -stdout
 
 add_custom_command (
     OUTPUT "${GEN_DIR}/monster_test.h"
@@ -13,6 +13,7 @@ add_custom_command (
 )
 
 add_executable(monster_test_solo monster_test_solo.c "${GEN_DIR}/monster_test.h")
+target_include_directories(monster_test_solo PRIVATE "${GEN_DIR}")
 target_link_libraries(monster_test_solo flatcc::runtime)
 
 add_test(NAME monster_test_solo COMMAND monster_test_solo)

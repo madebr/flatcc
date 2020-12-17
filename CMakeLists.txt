@@ -1,8 +1,4 @@
-# Ubuntu 14.04 (Trusty)
-#cmake_minimum_required (VERSION 2.8.12.2)
-# Centos 7
-#cmake_minimum_required (VERSION 2.8.11)
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.1)
 
 # Disable build of tests and samples. Due to custom build step
 # dependency on flatcc tool, some custom build configurations may
@@ -174,6 +170,7 @@ message(STATUS "lib install dir ${dist_dir}/${lib_dir}")
 # silenced for Clang, GCC and MSVC in generated headers.headers.
 
 if (CMAKE_C_COMPILER_ID MATCHES "Clang")
+    set(CLANG_VERSION "${CMAKE_C_COMPILER_VERSION}")
     # Clang or AppleClang
     message(STATUS "Setting Clang compiler options")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-prototypes")
@@ -195,8 +192,7 @@ if (CMAKE_C_COMPILER_ID MATCHES "Clang")
     # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -save-temps")
 
 elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
-                    OUTPUT_VARIABLE GCC_VERSION)
+    set(GCC_VERSION "${CMAKE_C_COMPILER_VERSION}")
     if (GCC_VERSION VERSION_LESS 4.7)
         message(STATUS "Setting older GNU C compiler options with FLATCC_PORTABLE")
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
