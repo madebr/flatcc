@@ -1,20 +1,76 @@
 # Use the following function to generate C source files from flatbuffer definition files:
 #
-# flatcc_generate_sources(OUTPUT_DIR <directory where to write source files>
-#                         BUILDER
-#                         VERIFIER
-#                         DEFINITION_FILES <list of flatbuffer definition files (.fbs)>
-# )
+# function signature:
 #
-# BUILDER and VERIFIER are boolean options. When specified they will instruct
-# flatcc to generate builder / verifier source code.
+#   flatcc_generate_sources(
+#      DEFINITION_FILES <flatbuffer-definition-file> [<flatbuffer-definition-file> [...]]
+#      [OUTPUT_DIR <output-directory>]
+#      [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
+#      [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
+#      [OUTFILE <output-file>] [PREFIX <prefix>] [TARGET <target-name>]
+#      [PATHS <include-path> [<include-path> [...]]]
+#      [COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]]
+#   )
 #
+# arguments:
+#
+#   OUTPUT_DIR <output-directory>
+#
+#     All generated sources will be written in the `output-directory` folder.
+#
+#   DEFINITION_FILES <definition-file> [<definition-file> [...]]
+#
+#     Flatcc will generate sources for all definition files listed here.
+#     This function also track included files, so it is not needed to list all dependent files here.
+#     Because the search for included files happens at configure time,
+#     the definition files must be available before calling this function.
+#
+#   ALL
+#   SCHEMA
+#   COMMON
+#   COMMON_READER
+#   COMMON_BUILDER
+#   BUILDER
+#   READER
+#   VERIFIER
+#   JSON_PARSER
+#   JSON_PRINTER
+#   JSON
+#   RECURSIVE
+#
+#     When specified, these will instruct flatcc to generate a specific type of source code.
+#     It is preferable to use these options instead of adding flatcc arguments to COMPILE_DEFINITIONS.
+#     This is because the generated sources will have correct dependency information.
+#     When none of these are specified, the default is READER.
+#     These options can be combined.
+#
+#   OUTFILE <output-file>
+#
+#     Write all source into one file named `output-file`.
+#
+#   PREFIX <prefix>
+#
+#     Prefix all symbols with `prefix`
+#
+#   TARGET <target>
+#
+#     Create a custom target named `target` that will generate the sources.
+#
+#   PATHS <include-path> [<include-path> [...]]
+#
+#     Add extra include search paths where flatcc should look for included defintion files.
+#
+#   COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]
+#
+#     Add extra arguments to flatcc.
+#
+
 # With cross-compiling you should provide the directory where the flatcc compiler executable is located
 # in environment variable FLATCC_BUILD_BIN_PATH. If you use Conan and add flatcc as a build requirement
 # this will be done automatically.
 
+# TODO: not needed when cmake_minimum_required_version >= 3.4
 include(CMakeParseArguments)
-
 
 function(flatcc_generate_sources)
     # parse function arguments
@@ -209,7 +265,8 @@ function(flatcc_generate_sources)
             set(definition_files ${ABSOLUTE_DEFINITION_FILES})
         endif()
         foreach(definition_file ${definition_files})
-            get_filename_component(def_name_we "${definition_file}" NAME_WLE)
+            # TODO: should be NAME_WLE, but not supported in cmake 2.8
+            get_filename_component(def_name_we "${definition_file}" NAME_WE)
             foreach(suffix ${GENERATED_FILE_SUFFIXES})
                 list(APPEND OUTPUT_FILES "${FLATCC_OUTPUT_DIR}/${def_name_we}${suffix}")
             endforeach()
@@ -223,12 +280,15 @@ function(flatcc_generate_sources)
         endif()
     endif()
 
-    message(VERBOSE "---- flatcc start ----")
-    message(VERBOSE "output directory: ${FLATCC_OUTPUT_DIR}")
-    message(VERBOSE "output files: ${OUTPUT_FILES}")
-    message(VERBOSE "execute: flatcc;${FLATCC_COMPILE_FLAGS};${ABSOLUTE_DEFINITION_FILES}")
-    message(VERBOSE "dependencies: ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}")
-    message(VERBOSE "----- flatcc end -----")
+    # TODO: VERBOSE was added in cmake 3.15.
+    if(NOT (CMAKE_VERSION VERSION_LESS 3.15))
+        message(VERBOSE "---- flatcc info start ----")
+        message(VERBOSE "output directory: ${FLATCC_OUTPUT_DIR}")
+        message(VERBOSE "output files: ${OUTPUT_FILES}")
+        message(VERBOSE "execute: flatcc;${FLATCC_COMPILE_FLAGS};${ABSOLUTE_DEFINITION_FILES}")
+        message(VERBOSE "dependencies: ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}")
+        message(VERBOSE "----- flatcc info end -----")
+    endif()
 
     add_custom_command(OUTPUT ${OUTPUT_FILES}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${FLATCC_OUTPUT_DIR}"

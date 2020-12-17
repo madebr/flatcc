@@ -190,38 +190,44 @@ their place.
 ## Use in CMake build
 
 If your project uses the CMake build system, you can include cmake module
-`cmake/FlatccGenerateSources.cmake` that provides the following cmake
-function:
+`FlatccGenerateSources.cmake` that provides the following cmake function:
 
-    flatcc_generate_sources(GENERATED_SOURCE_DIRECTORY <output directory>
-                            GENERATE_BUILDER
-                            GENERATE_VERIFIER
-                            EXPECTED_OUTPUT_FILES <list of expected output files>
-                            DEFINITION_FILES <list of flatbuffer files (.fbs)>
-)
+    flatcc_generate_sources(
+       DEFINITION_FILES <definition-file> [<definition-file> [...]]
+       [OUTPUT_DIR <output-directory>]
+       [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER]
+       [READER] [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
+       [OUTFILE <output-file>] [PREFIX <prefix>] [TARGET <target-name>]
+       [PATHS <include-path> [<include-path> [...]]]
+       [COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]]
+    )
 
-`GENERATE_BUILDER` and `GENERATE_VERIFIER` are boolean options. When specified
-they will instruct flatcc to generate builder / verifier source code.
+`DEFINITION_FILES` is the only required argument. As argument, it expects
+a list of flatbuffer definition files. These sources must be available when
+running these function as they are parsed for dependencies.
 
-Optionally you can let cmake know the directory where the flatcc executable
+`ALL`, `SCHEMA`, `COMMON`, `COMMON_READER`, `COMMON_BUILDER`, `BUILDER`,
+`READER`, `VERIFIER`, `JSON_PARSER`, `JSON_PRINTER` and `JSON` are boolean
+options that instruct flatcc what types of source/binary to generate.
+Documentation of all arguments can be found at the top of
+`FlatccGEnerateSources.cmake`.
+
+This function uses cmake's `add_custom command` internally. This means that
+the generated headers are only available in the build step, not the configure
+step.
+
+Optionally, you can let cmake know the directory where the flatcc executable
 is located in environment variable `FLATCC_BUILD_BIN_PATH`. This is especially
 usefull when cross-compiling. In that case you should provide the directory
 where the build arch flatcc compiler executable is located.
 
-The flatcc_generate_sources function will create a cmake custom command to
-generate the output files during just before compilation (so in the build
-step, not the configure step).
-
 Example:
 
     include(FlatccGenerateSources)
-    flatcc_generate_sources(GENERATED_SOURCE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/datadef
-                            GENERATE_BUILDER
-                            GENERATE_VERIFIER
-                            EXPECTED_OUTPUT_FILES datadef/seclif_protocol_reader.h
-                                                  datadef/seclif_protocol_builder.h
-                                                  datadef/seclif_protocol_verifier.h
-                            DEFINITION_FILES ${CMAKE_CURRENT_SOURCE_DIR}/datadef/seclif_protocol.fbs
+    flatcc_generate_sources(DEFINITION_FILES "datadef/seclif_protocol.fbs"
+                            OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/datadef"
+                            BUILDER
+                            VERIFIER
     )
 
 ## Poll on Meson Build
