@@ -1,7 +1,7 @@
 on:
-  - schedule:
-      # Run this script every saturday, so you have the whole weekend to fix problems :evil-grin:
-      - cron: '0 0 * * 6'
+  schedule:
+    # Run this script every saturday, so you have the whole weekend to fix problems :evil-grin:
+    - cron: '0 1 * * 6'
 
 jobs:
   merge_into_ci_more:

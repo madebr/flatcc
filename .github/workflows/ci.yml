@@ -4,6 +4,7 @@ on:
 jobs:
   test_unix:
     name: 'Test Unix with CMake'
+    if: ${{ github.ref != 'refs/heads/ci-more' }}
     strategy:
       matrix:
         os: ['macos-latest', 'ubuntu-latest']
@@ -51,6 +52,7 @@ jobs:
           ctest .
   test_windows:
     name: 'Test Windows with CMake'
+    if: ${{ github.ref != 'refs/heads/ci-more' }}
     strategy:
       matrix:
         config: ['Release', 'Debug']
