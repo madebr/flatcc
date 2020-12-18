@@ -3,7 +3,7 @@
 # as a dependency or adds the generated sources.
 #
 #   flatcc_generate_sources(
-#      <name>
+#      TARGET_NAME <name>
 #      DEFINITION_FILES <flatbuffer-definition-file> [<flatbuffer-definition-file> [...]]
 #      [OUTPUT_DIR <output-directory>]
 #      [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
@@ -90,15 +90,28 @@ cmake_minimum_required(VERSION 3.3)
 # TODO: not needed when cmake_minimum_required_version >= 3.4
 include(CMakeParseArguments)
 
-function(flatcc_generate_sources NAME)
+function(flatcc_generate_sources)
     # parse function arguments
     set(output_options SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
-    set(SINGLE_VAL_ARGS OUTPUT_DIR OUTFILE PREFIX TARGET)
+    set(SINGLE_VAL_ARGS TARGET_NAME OUTPUT_DIR OUTFILE PREFIX TARGET)
     set(MULTI_VAL_ARGS DEFINITION_FILES COMPILE_FLAGS PATHS)
 
     cmake_parse_arguments(FLATCC "${NO_VAL_ARGS}" "${SINGLE_VAL_ARGS}" "${MULTI_VAL_ARGS}" ${ARGN})
+    
+    # TODO: add following check when cmake_minimum_required_version >= 3.15
+    #if (FLATCC_KEYWORDS_MISSING_VALUES)
+    #    message(FATAL_ERROR "The following keywords in call to flatcc_generate_sources have no value: ${FLATCC_KEYWORDS_MISSING_VALUES}")
+    #endif()
 
+    if (FLATCC_UNPARSED_ARGUMENTS)
+        message(WARNING "The following unknown keywords in call to flatcc_generate_sources are ignored: ${FLATCC_UNPARSED_ARGUMENTS}")
+    endif()
+
+    if (NOT FLATCC_TARGET_NAME)
+        message(FATAL_ERROR "TARGET_NAME not provided in call to flatcc_generate_sources")
+    endif()
+    
     if (NOT FLATCC_DEFINITION_FILES)
         message(FATAL_ERROR "No flatbuffer definition files provided")
     endif()
@@ -317,13 +330,13 @@ function(flatcc_generate_sources NAME)
         DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
 
-    add_custom_target("flatcc_generated_${NAME}"
+    add_custom_target("flatcc_generated_${FLATCC_TARGET_NAME}"
         DEPENDS ${OUTPUT_FILES})
 
-    add_library("__flatcc_generated_${NAME}" INTERFACE)
-    target_include_directories("__flatcc_generated_${NAME}" INTERFACE "${FLATCC_OUTPUT_DIR}")
-    add_dependencies("__flatcc_generated_${NAME}" "flatcc_generated_${NAME}")
+    add_library("__flatcc_generated_${FLATCC_TARGET_NAME}" INTERFACE)
+    target_include_directories("__flatcc_generated_${FLATCC_TARGET_NAME}" INTERFACE "${FLATCC_OUTPUT_DIR}")
+    add_dependencies("__flatcc_generated_${FLATCC_TARGET_NAME}" "flatcc_generated_${FLATCC_TARGET_NAME}")
 
-    add_library("flatcc_generated::${NAME}" ALIAS "__flatcc_generated_${NAME}")
-    set("${NAME}_GENERATED_SOURCES" ${OUTPUT_FILES} PARENT_SCOPE)
+    add_library("flatcc_generated::${FLATCC_TARGET_NAME}" ALIAS "__flatcc_generated_${FLATCC_TARGET_NAME}")
+    set("${FLATCC_TARGET_NAME}_GENERATED_SOURCES" ${OUTPUT_FILES} PARENT_SCOPE)
 endfunction()
