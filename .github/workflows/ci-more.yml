@@ -6,7 +6,7 @@ on:
 jobs:
   merge_into_ci_more:
     # Only enable this job on dividelabs' repo to avoid running this job on forks
-    if: ${{ github.repository_owner == 'dividelabs' }}
+    #if: ${{ github.repository_owner == 'dividelabs' }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Checkout repo'
