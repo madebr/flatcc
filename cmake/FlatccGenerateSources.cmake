@@ -72,10 +72,6 @@
 #
 #     Prefix all symbols with `prefix`
 #
-#   TARGET <target>
-#
-#     Create a custom target named `target` that will generate the sources.
-#
 #   PATHS <include-path> [<include-path> [...]]
 #
 #     Add extra include search paths where flatcc should look for included defintion files.
@@ -94,7 +90,7 @@ function(flatcc_generate_sources)
     # parse function arguments
     set(output_options SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
-    set(SINGLE_VAL_ARGS OUTPUT_NAME OUTPUT_DIR OUTFILE PREFIX TARGET)
+    set(SINGLE_VAL_ARGS OUTPUT_NAME OUTPUT_DIR OUTFILE PREFIX)
     set(MULTI_VAL_ARGS DEFINITION_FILES COMPILE_FLAGS PATHS)
 
     cmake_parse_arguments(FLATCC "${NO_VAL_ARGS}" "${SINGLE_VAL_ARGS}" "${MULTI_VAL_ARGS}" ${ARGN})
