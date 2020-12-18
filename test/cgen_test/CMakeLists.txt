@@ -12,7 +12,7 @@ add_test(NAME cgen_test COMMAND cgen_test)
 if(CMAKE_VERSION VERSION_LESS 3.10)
     message(WARNING "generator test disabled due to old cmake version")
 else()
-    # TODO: the use of generator expressions requires cmake versions 3.2
+    # TODO: the use of generator expressions requires at least cmake versions 3.10 (3.5 does not, 3.10 does)
 
     # Compilation of the generated code tests many import edge cases
     # in the parser and code generator but due to CMake limitations,

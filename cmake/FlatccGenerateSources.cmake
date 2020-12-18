@@ -85,7 +85,7 @@
 #     Add extra arguments to flatcc.
 #
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.3)
 
 # TODO: not needed when cmake_minimum_required_version >= 3.4
 include(CMakeParseArguments)
