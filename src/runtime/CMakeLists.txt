@@ -14,5 +14,5 @@ set_target_properties(flatccrt PROPERTIES
     EXPORT_NAME runtime)
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatccrt EXPORT flatcc_exports DESTINATION ${lib_dir})
+    install(TARGETS flatccrt EXPORT flatcc_runtime_exports DESTINATION ${lib_dir})
 endif()

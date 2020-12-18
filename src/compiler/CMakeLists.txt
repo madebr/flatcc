@@ -45,5 +45,5 @@ target_include_directories(flatcc
 set_target_properties(flatcc PROPERTIES EXPORT_NAME compiler)
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatcc EXPORT flatcc_exports DESTINATION ${lib_dir})
+    install(TARGETS flatcc EXPORT flatcc_runtime_exports DESTINATION ${lib_dir})
 endif()

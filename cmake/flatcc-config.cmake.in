@@ -1,7 +1,37 @@
 @PACKAGE_INIT@
 
-# Make available all imported targets
-include("${CMAKE_CURRENT_LIST_DIR}/flatcc-targets.cmake")
+cmake_minimum_required(VERSION 3.3)
 
-# Make available the cmake scripts in the current folder
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+set(fp_args)
+if(flatcc_FIND_VERSION_RANGE)
+    list(APPEND fp_args "${flatcc_FIND_VERSION_RANGE}")
+endif()
+if(flatcc_FIND_VERSION_EXACT)
+    list(APPEND fp_args "EXACT")
+endif()
+if(flatcc_FIND_QUIETLY)
+    list(APPEND fp_args "QUIET")
+endif()
+if(flatcc_FIND_REQUIRED)
+    list(APPEND fp_args "REQUIRED")
+endif()
+
+if("runtime" IN_LIST flatcc_FIND_COMPONENTS)
+    set(fp_runtime_args)
+    if(flatcc_FIND_REQUIRED_runtime)
+        list(APPEND fp_runtime_args REQUIRED)
+    endif()
+    find_package(flatccRuntime ${fp_args} ${fp_runtime_args})
+    set(flatcc_runtime_FOUND ${flatccRuntime_FOUND})
+endif()
+
+if("cli" IN_LIST flatcc_FIND_COMPONENTS)
+    set(fp_cli_args)
+    if(flatcc_FIND_REQUIRED_cli)
+        list(APPEND fp_cli_args REQUIRED)
+    endif()
+    find_package(flatccCli ${fp_args} ${fp_cli_args})
+    set(flatcc_cli_FOUND ${flatccCli_FOUND})
+endif()
+
+check_required_components(flatcc)

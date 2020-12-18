@@ -21,5 +21,5 @@ endif()
 
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatcc_cli EXPORT flatcc_exports DESTINATION bin)
+    install(TARGETS flatcc_cli EXPORT flatcc_cli_exports DESTINATION bin)
 endif()

@@ -346,7 +346,8 @@ set_target_properties(${dist_targets}
 
 if (FLATCC_INSTALL)
     install(DIRECTORY include/flatcc DESTINATION include)
-    install(EXPORT flatcc_exports NAMESPACE flatcc:: DESTINATION ${lib_dir}/cmake/flatcc FILE flatcc-targets.cmake)
+    install(EXPORT flatcc_runtime_exports NAMESPACE flatcc:: DESTINATION ${lib_dir}/cmake/flatccRuntime FILE flatccRuntime-config.cmake)
+    install(EXPORT flatcc_cli_exports NAMESPACE flatcc:: DESTINATION ${lib_dir}/cmake/flatccCli FILE flatccCli-config.cmake)
 
     file(READ include/flatcc/flatcc_version.h FLATCC_VERSION_H_CONTENT)
     string(REGEX MATCH "#[ \t]*define[ \t]+FLATCC_VERSION_TEXT[ \t]+\"([^\"]+)\"" version_match "${FLATCC_VERSION_H_CONTENT}")
@@ -357,6 +358,7 @@ if (FLATCC_INSTALL)
     message(VERBOSE "Extracted version from include/flatcc/flatcc_version.h: ${FLATCC_VERSION}")
 
     include(CMakePackageConfigHelpers)
+
     configure_package_config_file(cmake/flatcc-config.cmake.in flatcc-config.cmake
         INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatcc")
     write_basic_package_version_file(flatcc-config-version.cmake
@@ -366,6 +368,25 @@ if (FLATCC_INSTALL)
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/flatcc-config.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/flatcc-config-version.cmake"
-            cmake/FlatccGenerateSources.cmake
         DESTINATION "lib/cmake/flatcc")
+
+    configure_package_config_file(cmake/flatccCli-config.cmake.in flatccCli-config.cmake
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatcc")
+    write_basic_package_version_file(flatccCli-config-version.cmake
+        VERSION "${FLATCC_VERSION}"
+        COMPATIBILITY AnyNewerVersion)
+    install(
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/flatccCli-config.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/flatccCli-config-version.cmake"
+            cmake/FlatccGenerateSources.cmake
+        DESTINATION "lib/cmake/flatccCli")
+
+    write_basic_package_version_file(flatccRuntime-config-version.cmake
+        VERSION "${FLATCC_VERSION}"
+        COMPATIBILITY AnyNewerVersion)
+    install(
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/flatccRuntime-config-version.cmake"
+        DESTINATION "lib/cmake/flatccRuntime")
 endif()

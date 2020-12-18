@@ -252,6 +252,11 @@ Example:
     add_executable(my_main main.c)
     target_link_libraries(seclif_protocol PRIVATE flatcc::runtime flatcc_generated::seclif_protocol)
 
+Cross building with flatbuffers on cmake is possible by overriding the
+search path of the `flatccCli` and `flatccRuntime` module. See the documentation of
+[`find_package`](https://cmake.org/cmake/help/latest/command/find_package.html#search-procedure)
+for more information about how the search procedure can be overridden.
+
 ## Poll on Meson Build
 
 It is being considered adding support for the Meson build system, but it
