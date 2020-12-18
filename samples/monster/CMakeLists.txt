@@ -1,7 +1,8 @@
 set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(FBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-flatcc_generate_sources(monster_sample
+flatcc_generate_sources(
+    NAME monster_sample
     DEFINITION_FILES monster.fbs
     ALL
     OUTPUT_DIR "${GEN_DIR}"

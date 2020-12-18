@@ -22,7 +22,8 @@ else()
     # separating arguments should fix this, but not sure how portable it is.
     # see also http://stackoverflow.com/questions/9870162/avoid-quoting-in-cmake-add-custom-command
 
-    add_custom_COMMAND(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test_generated${CMAKE_EXECUTABLE_SUFFIX}.c"
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test_generated${CMAKE_EXECUTABLE_SUFFIX}.c"
         COMMAND cgen_test > "${CMAKE_CURRENT_BINARY_DIR}/test_generated${CMAKE_EXECUTABLE_SUFFIX}.c"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test/cgen_test
         DEPENDS cgen_test

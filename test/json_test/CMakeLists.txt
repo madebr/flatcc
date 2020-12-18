@@ -4,7 +4,8 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/test/monster_test")
 set(DATA_DST "${CMAKE_CURRENT_BINARY_DIR}")
 set(DATA_SRC "${PROJECT_SOURCE_DIR}/test/flatc_compat")
 
-flatcc_generate_sources(json_test
+flatcc_generate_sources(
+    NAME json_test
     DEFINITION_FILES "${FBS_DIR}/monster_test.fbs"
     ALL VERIFIER JSON
     OUTPUT_DIR "${GEN_DIR}"

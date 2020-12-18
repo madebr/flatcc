@@ -193,7 +193,7 @@ If your project uses the CMake build system, you can include cmake module
 `FlatccGenerateSources.cmake` that provides the following cmake function:
 
     flatcc_generate_sources(
-       <name>
+       NAME <name>
        DEFINITION_FILES <definition-file> [<definition-file> [...]]
        [OUTPUT_DIR <output-directory>]
        [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER]
@@ -215,7 +215,7 @@ These can be used by adding they to `add_library`/`add_executable`.
 
 This function accepts the following arguments:
 
-`<name>` is a unique name on which all output variables/targets are based.
+NAME `<name>` is a unique name on which all output variables/targets are based.
 
 `DEFINITION_FILES` is a required argument. As argument, it expects
 a list of flatbuffer definition files. These sources must be available when
