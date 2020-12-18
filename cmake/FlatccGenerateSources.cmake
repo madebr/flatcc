@@ -115,6 +115,9 @@ function(flatcc_generate_sources)
     if (NOT FLATCC_OUTPUT_DIR)
         set(FLATCC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
+    if (NOT IS_ABSOLUTE FLATCC_OUTPUT_DIR)
+        set(FLATCC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${FLATCC_OUTPUT_DIR}")
+    endif()
 
     list(APPEND FLATCC_COMPILE_FLAGS -o "${FLATCC_OUTPUT_DIR}")
 
