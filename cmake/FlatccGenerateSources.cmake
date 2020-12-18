@@ -316,10 +316,14 @@ function(flatcc_generate_sources NAME)
         COMMAND flatcc::cli ${FLATCC_COMPILE_FLAGS} ${ABSOLUTE_DEFINITION_FILES}
         DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
-    add_library("_flatcc_generated_${NAME}" INTERFACE)
-    target_sources("_flatcc_generated_${NAME}" INTERFACE ${OUTPUT_FILES})
-    target_include_directories("_flatcc_generated_${NAME}" INTERFACE "${FLATCC_OUTPUT_DIR}")
 
-    add_library("flatcc_generated::${NAME}" ALIAS "_flatcc_generated_${NAME}")
+    add_custom_target("flatcc_generated_${NAME}"
+        DEPENDS ${OUTPUT_FILES})
+
+    add_library("__flatcc_generated_${NAME}" INTERFACE)
+    target_include_directories("__flatcc_generated_${NAME}" INTERFACE "${FLATCC_OUTPUT_DIR}")
+    add_dependencies("__flatcc_generated_${NAME}" "flatcc_generated_${NAME}")
+
+    add_library("flatcc_generated::${NAME}" ALIAS "__flatcc_generated_${NAME}")
     set("${NAME}_GENERATED_SOURCES" ${OUTPUT_FILES} PARENT_SCOPE)
 endfunction()
