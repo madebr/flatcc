@@ -1,5 +1,6 @@
 set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
-set(FBS_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# Don't use FBS_DIR to test whether flatcc_generate_sources knows to use the correct file.
 
 flatcc_generate_sources(
     NAME monster_sample
