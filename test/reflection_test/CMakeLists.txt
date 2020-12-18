@@ -4,7 +4,8 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/test/monster_test")
 flatcc_generate_sources(
     NAME reflection_test
     SCHEMA_FILES "${FBS_DIR}/monster_test.fbs"
-    SCHEMA OUTPUT_DIR "${GEN_DIR}"
+    BINARY_SCHEMA
+    OUTPUT_DIR "${GEN_DIR}"
 )
 
 add_executable(reflection_test reflection_test.c)

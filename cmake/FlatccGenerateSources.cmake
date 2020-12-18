@@ -5,8 +5,8 @@
 #   flatcc_generate_sources(
 #      NAME <name>
 #      SCHEMA_FILES <schema-file> [<schema-file> [...]]
+#      [ALL] [BINARY_SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
 #      [OUTPUT_DIR <output-directory>]
-#      [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
 #      [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
 #      [OUTFILE <output-file>] [PREFIX <prefix>]
 #      [PATHS <include-path> [<include-path> [...]]]
@@ -46,7 +46,7 @@
 #     All generated sources will be written in the `output-directory` folder.
 #
 #   ALL
-#   SCHEMA
+#   BINARY_SCHEMA
 #   COMMON
 #   COMMON_READER
 #   COMMON_BUILDER
@@ -88,7 +88,7 @@ include(CMakeParseArguments)
 
 function(flatcc_generate_sources)
     # parse function arguments
-    set(output_options SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
+    set(output_options BINARY_SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
     set(SINGLE_VAL_ARGS NAME OUTPUT_DIR OUTFILE PREFIX)
     set(MULTI_VAL_ARGS SCHEMA_FILES COMPILE_FLAGS PATHS)
@@ -191,7 +191,7 @@ function(flatcc_generate_sources)
     if (FLATCC_JSON_PRINTER)
         list(APPEND FLATCC_COMPILE_FLAGS --json-printer)
     endif()
-    if (FLATCC_SCHEMA)
+    if (FLATCC_BINARY_SCHEMA)
         list(APPEND FLATCC_COMPILE_FLAGS --schema)
     endif()
     if (FLATCC_RECURSIVE)
@@ -237,16 +237,16 @@ function(flatcc_generate_sources)
     if(FLATCC_JSON_PRINTER)
         list(APPEND GENERATED_FILE_SUFFIXES _json_printer.h)
     endif()
-    if(FLATCC_SCHEMA)
+    if(FLATCC_BINARY_SCHEMA)
         list(APPEND GENERATED_FILE_SUFFIXES .bfbs)
     endif()
 
     # grep each definition file recursively for includes, convert them to absolute paths and add them to a list
     set(ABSOLUTE_DEFINITIONS_DEPENDENCIES)
-    set(absolute_SCHEMA_FILES_todo ${ABSOLUTE_SCHEMA_FILES})
-    while(absolute_SCHEMA_FILES_todo)
-        list(GET absolute_SCHEMA_FILES_todo 0 current_deffile)
-        # TODO: use if(absolute_SCHEMA_FILES_todo IN_LIST ABSOLUTE_DEFINITIONS_DEPENDENCIES) if cmake_minimum_required_version >= 3.3
+    set(absolute_schema_files_todo ${ABSOLUTE_SCHEMA_FILES})
+    while(absolute_schema_files_todo)
+        list(GET absolute_schema_files_todo 0 current_deffile)
+        # TODO: use if(absolute_schema_files_todo IN_LIST ABSOLUTE_DEFINITIONS_DEPENDENCIES) if cmake_minimum_required_version >= 3.3
         list(FIND ABSOLUTE_DEFINITIONS_DEPENDENCIES "${current_deffile}" todo_index)
         if(todo_index LESS 0)
             list(APPEND ABSOLUTE_DEFINITIONS_DEPENDENCIES "${current_deffile}")
@@ -272,11 +272,11 @@ function(flatcc_generate_sources)
                     endif()
                 endif()
                 if(abs_include_def_file)
-                    list(APPEND absolute_SCHEMA_FILES_todo "${abs_include_def_file}")
+                    list(APPEND absolute_schema_files_todo "${abs_include_def_file}")
                 endif()
             endforeach()
         endif()
-        list(REMOVE_AT absolute_SCHEMA_FILES_todo 0)
+        list(REMOVE_AT absolute_schema_files_todo 0)
     endwhile()
 
     list(REMOVE_DUPLICATES ABSOLUTE_DEFINITIONS_DEPENDENCIES)

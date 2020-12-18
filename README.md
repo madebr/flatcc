@@ -196,7 +196,7 @@ If your project uses the CMake build system, you can include the cmake module
        NAME <name>
        SCHEMA_FILES <schema-file> [<schema-file> [...]]
        [OUTPUT_DIR <output-directory>]
-       [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER]
+       [ALL] [BINARY_SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER]
        [READER] [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
        [OUTFILE <output-file>] [PREFIX <prefix>] [TARGET <target-name>]
        [PATHS <include-path> [<include-path> [...]]]
@@ -226,7 +226,7 @@ are generated dynamically, then you should make use
 [`add_custom_command`](https://cmake.org/cmake/help/latest/command/add_custom_command.html).
 See [test/monster_test_solo] for an example on how to do this.
 
-- `ALL`, `SCHEMA`, `COMMON`, `COMMON_READER`, `COMMON_BUILDER`, `BUILDER`,
+- `ALL`, `BINARY_SCHEMA`, `COMMON`, `COMMON_READER`, `COMMON_BUILDER`, `BUILDER`,
 `READER`, `VERIFIER`, `JSON_PARSER`, `JSON_PRINTER` and `JSON` are boolean
 options that instruct flatcc what types of source/binary to generate.
 Documentation of all arguments can be found at the top of
