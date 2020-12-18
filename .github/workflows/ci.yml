@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: ['macos-latest', 'ubuntu-latest']
         config: ['Release', 'Debug']
-        cmake_generator: []'Unix Makefiles']
+        cmake_generator: ['Unix Makefiles']
         include:
           - os: 'macos-latest'
             config: 'Release'
