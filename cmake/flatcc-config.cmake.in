@@ -2,6 +2,10 @@
 
 cmake_minimum_required(VERSION 3.3)
 
+if(NOT flatcc_FIND_COMPONENTS)
+    set(flatcc_FIND_COMPONENTS cli runtime)
+endif()
+
 set(fp_args)
 if(flatcc_FIND_VERSION_RANGE)
     list(APPEND fp_args "${flatcc_FIND_VERSION_RANGE}")

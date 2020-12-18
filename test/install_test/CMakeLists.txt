@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.3)
 project(flatcc_install_test)
 
-find_package(flatcc REQUIRED COMPONENTS cli runtime)
+find_package(flatcc REQUIRED)
 
 if(NOT TARGET flatcc::cli)
     message(FATAL_ERROR "flatcc::cli target not available")
