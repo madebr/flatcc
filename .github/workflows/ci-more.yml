@@ -1,0 +1,36 @@
+on:
+  - schedule:
+      # Run this script every saturday, so you have the whole weekend to fix problems :evil-grin:
+      - cron: '0 0 * * 6'
+
+jobs:
+  merge_into_ci_more:
+    # Only enable this job on dividelabs' repo to avoid running this job on forks
+    if: ${{ github.repository_owner == 'dividelabs' }}
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout repo'
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: 'Checkout ci-more'
+        run: |
+          git checkout ci-more
+      - name: 'Backup .travis.yml and appveyor.yml'
+        run: |
+          cp .travis.yml .travis.yml.backup
+          cp appveyor.yml.backup appveyor.yml.backup
+      - name: 'Merge master into ci-more'
+        run: |
+          git merge origin/master
+      - name: 'Restore .travis.yml and appveyor.yml'
+        run: |
+          mv .travis.yml.backup .travis.yml
+          mv appveyor.yml.backup appveyor.yml.backup
+      - name: 'Add all and create a commit'
+        run: |
+          git add -A
+          git commit -m "Weekly ci-more commit" --allow-empty
+      - name: 'Push ci-more to server'
+        run: |
+          git push origin ci-more
