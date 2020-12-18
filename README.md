@@ -194,7 +194,7 @@ If your project uses the CMake build system, you can include the cmake module
 
     flatcc_generate_sources(
        NAME <name>
-       DEFINITION_FILES <definition-file> [<definition-file> [...]]
+       SCHEMA_FILES <schema-file> [<schema-file> [...]]
        [OUTPUT_DIR <output-directory>]
        [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER]
        [READER] [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
@@ -219,7 +219,7 @@ This function accepts the following arguments:
 
 - NAME `<name>` is a unique name on which all output variables/targets are based.
 
-- `DEFINITION_FILES` is a required argument. As argument, it expects
+- `SCHEMA_FILES` is a required argument. As argument, it expects
 a list of flatbuffer definition files. These sources must be available when
 running this function as they are parsed for dependencies. If the definition files
 are generated dynamically, then you should make use
@@ -248,7 +248,7 @@ Example:
     include(FlatccGenerateSources)
     flatcc_generate_sources(
         NAME seclif_protocol
-        DEFINITION_FILES "datadef/seclif_protocol.fbs"
+        SCHEMA_FILES "datadef/seclif_protocol.fbs"
         OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/datadef"
         BUILDER
         VERIFIER

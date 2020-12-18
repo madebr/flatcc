@@ -4,7 +4,7 @@
 #
 #   flatcc_generate_sources(
 #      NAME <name>
-#      DEFINITION_FILES <flatbuffer-definition-file> [<flatbuffer-definition-file> [...]]
+#      SCHEMA_FILES <schema-file> [<schema-file> [...]]
 #      [OUTPUT_DIR <output-directory>]
 #      [ALL] [SCHEMA] [COMMON] [COMMON_READER] [COMMON_BUILDER] [BUILDER] [READER]
 #      [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
@@ -32,7 +32,7 @@
 #
 #     Unique name. It is used for output variable(s) and target(s).
 #
-#   DEFINITION_FILES <definition-file> [<definition-file> [...]]
+#   SCHEMA_FILES <schema-file> [<schema-file> [...]]
 #
 #     Flatcc will generate sources for all definition files listed here.
 #     This function also track included files, so it is not needed to list all dependent files here.
@@ -91,7 +91,7 @@ function(flatcc_generate_sources)
     set(output_options SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
     set(SINGLE_VAL_ARGS NAME OUTPUT_DIR OUTFILE PREFIX)
-    set(MULTI_VAL_ARGS DEFINITION_FILES COMPILE_FLAGS PATHS)
+    set(MULTI_VAL_ARGS SCHEMA_FILES COMPILE_FLAGS PATHS)
 
     cmake_parse_arguments(FLATCC "${NO_VAL_ARGS}" "${SINGLE_VAL_ARGS}" "${MULTI_VAL_ARGS}" ${ARGN})
     
@@ -108,7 +108,7 @@ function(flatcc_generate_sources)
         message(FATAL_ERROR "NAME not provided in call to flatcc_generate_sources")
     endif()
     
-    if (NOT FLATCC_DEFINITION_FILES)
+    if (NOT FLATCC_SCHEMA_FILES)
         message(FATAL_ERROR "No flatbuffer definition files provided")
     endif()
 
@@ -121,18 +121,18 @@ function(flatcc_generate_sources)
     # Add current source directory for finding dependencies
     set(absolute_flatcc_paths "${CMAKE_CURRENT_SOURCE_DIR}")
     # Also add directory of definition files
-    foreach(definition_file FLATCC_DEFINITION_FILES)
+    foreach(definition_file FLATCC_SCHEMA_FILES)
     endforeach()
 
-    set(ABSOLUTE_DEFINITION_FILES)
-    foreach(definition_file ${FLATCC_DEFINITION_FILES})
+    set(ABSOLUTE_SCHEMA_FILES)
+    foreach(definition_file ${FLATCC_SCHEMA_FILES})
         # TODO: file(REAL_PATH) if cmake_minimum_required_version >= 3.19
         if(IS_ABSOLUTE "${definition_file}")
             set(absolute_def_file "${definition_file}")
         else()
             set(absolute_def_file "${CMAKE_CURRENT_SOURCE_DIR}/${definition_file}")
         endif()
-        list(APPEND ABSOLUTE_DEFINITION_FILES "${absolute_def_file}")
+        list(APPEND ABSOLUTE_SCHEMA_FILES "${absolute_def_file}")
 
         get_filename_component(absolute_def_directory "${absolute_def_file}" DIRECTORY)
         list(APPEND absolute_flatcc_paths "${absolute_def_directory}")
@@ -243,10 +243,10 @@ function(flatcc_generate_sources)
 
     # grep each definition file recursively for includes, convert them to absolute paths and add them to a list
     set(ABSOLUTE_DEFINITIONS_DEPENDENCIES)
-    set(absolute_definition_files_todo ${ABSOLUTE_DEFINITION_FILES})
-    while(absolute_definition_files_todo)
-        list(GET absolute_definition_files_todo 0 current_deffile)
-        # TODO: use if(absolute_definition_files_todo IN_LIST ABSOLUTE_DEFINITIONS_DEPENDENCIES) if cmake_minimum_required_version >= 3.3
+    set(absolute_SCHEMA_FILES_todo ${ABSOLUTE_SCHEMA_FILES})
+    while(absolute_SCHEMA_FILES_todo)
+        list(GET absolute_SCHEMA_FILES_todo 0 current_deffile)
+        # TODO: use if(absolute_SCHEMA_FILES_todo IN_LIST ABSOLUTE_DEFINITIONS_DEPENDENCIES) if cmake_minimum_required_version >= 3.3
         list(FIND ABSOLUTE_DEFINITIONS_DEPENDENCIES "${current_deffile}" todo_index)
         if(todo_index LESS 0)
             list(APPEND ABSOLUTE_DEFINITIONS_DEPENDENCIES "${current_deffile}")
@@ -272,15 +272,15 @@ function(flatcc_generate_sources)
                     endif()
                 endif()
                 if(abs_include_def_file)
-                    list(APPEND absolute_definition_files_todo "${abs_include_def_file}")
+                    list(APPEND absolute_SCHEMA_FILES_todo "${abs_include_def_file}")
                 endif()
             endforeach()
         endif()
-        list(REMOVE_AT absolute_definition_files_todo 0)
+        list(REMOVE_AT absolute_SCHEMA_FILES_todo 0)
     endwhile()
 
     list(REMOVE_DUPLICATES ABSOLUTE_DEFINITIONS_DEPENDENCIES)
-    list(REMOVE_DUPLICATES ABSOLUTE_DEFINITION_FILES)
+    list(REMOVE_DUPLICATES ABSOLUTE_SCHEMA_FILES)
 
     set(OUTPUT_FILES)
     if(FLATCC_OUTFILE)
@@ -288,11 +288,11 @@ function(flatcc_generate_sources)
         list(APPEND OUTPUT_FILES "${FLATCC_OUTPUT_DIR}/${FLATCC_OUTFILE}")
     else()
         if(FLATCC_RECURSIVE)
-            set(definition_files ${ABSOLUTE_DEFINITIONS_DEPENDENCIES})
+            set(SCHEMA_FILES ${ABSOLUTE_DEFINITIONS_DEPENDENCIES})
         else()
-            set(definition_files ${ABSOLUTE_DEFINITION_FILES})
+            set(SCHEMA_FILES ${ABSOLUTE_SCHEMA_FILES})
         endif()
-        foreach(definition_file ${definition_files})
+        foreach(definition_file ${SCHEMA_FILES})
             # TODO: should be NAME_WLE, but not supported in cmake 2.8
             get_filename_component(def_name_we "${definition_file}" NAME_WE)
             foreach(suffix ${GENERATED_FILE_SUFFIXES})
@@ -313,7 +313,7 @@ function(flatcc_generate_sources)
         message(VERBOSE "---- flatcc info start ----")
         message(VERBOSE "output directory: ${FLATCC_OUTPUT_DIR}")
         message(VERBOSE "output files: ${OUTPUT_FILES}")
-        message(VERBOSE "execute: flatcc;${FLATCC_COMPILE_FLAGS};${ABSOLUTE_DEFINITION_FILES}")
+        message(VERBOSE "execute: flatcc;${FLATCC_COMPILE_FLAGS};${ABSOLUTE_SCHEMA_FILES}")
         message(VERBOSE "dependencies: ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}")
         message(VERBOSE "----- flatcc info end -----")
     endif()
@@ -322,7 +322,7 @@ function(flatcc_generate_sources)
 
     add_custom_command(OUTPUT ${OUTPUT_FILES}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${FLATCC_OUTPUT_DIR}"
-        COMMAND flatcc::cli ${FLATCC_COMPILE_FLAGS} ${ABSOLUTE_DEFINITION_FILES}
+        COMMAND flatcc::cli ${FLATCC_COMPILE_FLAGS} ${ABSOLUTE_SCHEMA_FILES}
         DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
 

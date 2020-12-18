@@ -3,7 +3,7 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/test/emit_test")
 
 flatcc_generate_sources(
     NAME emit_test
-    DEFINITION_FILES "${FBS_DIR}/emit_test.fbs"
+    SCHEMA_FILES "${FBS_DIR}/emit_test.fbs"
     ALL
     OUTPUT_DIR "${GEN_DIR}"
 )

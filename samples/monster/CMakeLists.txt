@@ -4,7 +4,7 @@ set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 flatcc_generate_sources(
     NAME monster_sample
-    DEFINITION_FILES monster.fbs
+    SCHEMA_FILES monster.fbs
     ALL
     OUTPUT_DIR "${GEN_DIR}"
 )

@@ -6,7 +6,7 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/samples/monster")
 
 flatcc_generate_sources(
     NAME monster_test_cpp
-    DEFINITION_FILES "${FBS_DIR}/monster.fbs"
+    SCHEMA_FILES "${FBS_DIR}/monster.fbs"
     ALL
     OUTPUT_DIR "${GEN_DIR}"
 )

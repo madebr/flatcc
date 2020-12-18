@@ -12,7 +12,7 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/samples/monster")
 
 flatcc_generate_sources(
     NAME reflection_sample
-    DEFINITION_FILES "${FBS_DIR}/monster.fbs"
+    SCHEMA_FILES "${FBS_DIR}/monster.fbs"
     SCHEMA
     OUTPUT_DIR "${GEN_DIR}"
 )

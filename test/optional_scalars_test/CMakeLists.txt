@@ -3,7 +3,7 @@ set(FBS_DIR "${PROJECT_SOURCE_DIR}/test/optional_scalars_test")
 
 flatcc_generate_sources(
     NAME optional_scalars_test
-    DEFINITION_FILES "${FBS_DIR}/optional_scalars_test.fbs"
+    SCHEMA_FILES "${FBS_DIR}/optional_scalars_test.fbs"
     ALL
     JSON
     OUTPUT_DIR "${GEN_DIR}"
