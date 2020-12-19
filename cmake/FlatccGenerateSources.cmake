@@ -308,7 +308,7 @@ function(flatcc_generate_sources)
         endif()
     endif()
 
-    set(FLATCC_ARGS ${FLATCC_EXTRA_ARGS})
+    list(APPEND FLATCC_ARGS ${FLATCC_EXTRA_ARGS})
 
     # TODO: VERBOSE was added in cmake 3.15.
     if(NOT (CMAKE_VERSION VERSION_LESS 3.15))
