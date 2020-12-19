@@ -1,6 +1,6 @@
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
 jobs:
   test_unix:
     name: 'Test Unix with CMake'
