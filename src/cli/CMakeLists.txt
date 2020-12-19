@@ -22,7 +22,7 @@ endif()
 if(BUILD_SHARED_LIBS)
     if(APPLE)
         set_target_properties(flatcc_cli PROPERTIES
-            MACOSX_RPATH ON
+            MACOSX_RPATH 1
             INSTALL_RPATH "@executable_path/../${lib_dir}"
         )
     elseif(UNIX)
