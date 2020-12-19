@@ -154,10 +154,9 @@ if (FLATCC_FAST_DOUBLE)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGRISU3_PARSE_ALLOW_ERROR -DFLATCC_USE_GRISU3=1")
 endif()
 
-if (NOT DEFINED FLATCC_INSTALL_LIB)
-    set(lib_dir lib)
-else()
-    set(lib_dir ${FLATCC_INSTALL_LIB})
+include(GNUInstallDirs)
+if (FLATCC_INSTALL_LIB)
+    set(CMAKE_INSTALL_LIBDIR ${FLATCC_INSTALL_LIB})
 endif()
 
 # The folder of this directory, as apposed to CMAKE_BINARY_DIR
@@ -166,7 +165,7 @@ set (dist_dir "${PROJECT_SOURCE_DIR}")
 # set (dist_dir "${CMAKE_BINARY_DIR}")
 
 message(STATUS "dist install dir ${dist_dir}")
-message(STATUS "lib install dir ${dist_dir}/${lib_dir}")
+message(STATUS "lib install dir ${dist_dir}/${CMAKE_INSTALL_LIBDIR}")
 
 # Note: for compiling generated C code, warnings of unused functions
 # and constants should be turned off - those are plentiful. They are
@@ -301,7 +300,7 @@ if (GCC_VERSION)
 endif()
 message(STATUS "Configured C_FLAGS: ${CMAKE_C_FLAGS}")
 
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${lib_dir})
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/${CMAKE_INSTALL_LIBDIR})
 
 set(CMAKE_DEBUG_POSTFIX "_d")
 
@@ -311,10 +310,10 @@ endif()
 
 if(BUILD_SHARED_LIBS)
     if(APPLE)
-        set(CMAKE_INSTALL_RPATH "@executable_path/../${lib_dir}")
+        set(CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
         set(CMAKE_MACOSX_RPATH 1)
     elseif(UNIX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../${lib_dir}")
+        set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
     endif()
 endif()
 
@@ -350,15 +349,15 @@ endif()
 
 set_target_properties(${dist_targets}
     PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${dist_dir}/${lib_dir}"
-    LIBRARY_OUTPUT_DIRECTORY "${dist_dir}/${lib_dir}"
+    ARCHIVE_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}"
     RUNTIME_OUTPUT_DIRECTORY "${dist_dir}/bin"
 )
 
 if (FLATCC_INSTALL)
     install(DIRECTORY include/flatcc DESTINATION include)
-    install(EXPORT flatcc_runtime_exports NAMESPACE flatcc:: DESTINATION ${lib_dir}/cmake/flatccruntime FILE flatccruntime-targets.cmake)
-    install(EXPORT flatcc_cli_exports NAMESPACE flatcc:: DESTINATION ${lib_dir}/cmake/flatcccli FILE flatcccli-targets.cmake)
+    install(EXPORT flatcc_runtime_exports NAMESPACE flatcc:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flatccruntime FILE flatccruntime-targets.cmake)
+    install(EXPORT flatcc_cli_exports NAMESPACE flatcc:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flatcccli FILE flatcccli-targets.cmake)
 
     file(READ include/flatcc/flatcc_version.h FLATCC_VERSION_H_CONTENT)
     string(REGEX MATCH "#[ \t]*define[ \t]+FLATCC_VERSION_TEXT[ \t]+\"([^\"]+)\"" version_match "${FLATCC_VERSION_H_CONTENT}")
@@ -379,7 +378,7 @@ if (FLATCC_INSTALL)
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/flatcc-config.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/flatcc-config-version.cmake"
-        DESTINATION "lib/cmake/flatcc")
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatcc")
 
     configure_package_config_file(cmake/flatcccli-config.cmake.in flatcccli-config.cmake
         INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatcc")
@@ -391,7 +390,7 @@ if (FLATCC_INSTALL)
             "${CMAKE_CURRENT_BINARY_DIR}/flatcccli-config.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/flatcccli-config-version.cmake"
             cmake/FlatccGenerateSources.cmake
-        DESTINATION "lib/cmake/flatcccli")
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatcccli")
 
     configure_package_config_file(cmake/flatccruntime-config.cmake.in flatccruntime-config.cmake
         INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatccruntime")
@@ -402,5 +401,5 @@ if (FLATCC_INSTALL)
         FILES
             "${CMAKE_CURRENT_BINARY_DIR}/flatccruntime-config.cmake"
             "${CMAKE_CURRENT_BINARY_DIR}/flatccruntime-config-version.cmake"
-        DESTINATION "lib/cmake/flatccruntime")
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/flatccruntime")
 endif()
