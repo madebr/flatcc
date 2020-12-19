@@ -1,4 +1,4 @@
-# Use `flatcc_generate_sources` to generate C source files from flatbuffer definition files.
+# Use `flatcc_generate_sources` to generate C source files from flatbuffer schema files.
 # The sources will be generated at build time, and only if some target has the output target
 # as a dependency or adds the generated sources.
 #
@@ -34,10 +34,10 @@
 #
 #   SCHEMA_FILES <schema-file> [<schema-file> [...]]
 #
-#     Flatcc will generate sources for all definition files listed here.
+#     Flatcc will generate sources for all schema files listed here.
 #     This function also track included files, so it is not needed to list all dependent files here.
 #     Because the search for included files happens at configure time,
-#     the definition files must be available before calling this function.
+#     the schema files must be available before calling this function.
 #
 # Optional arguments:
 #
@@ -109,7 +109,7 @@ function(flatcc_generate_sources)
     endif()
     
     if (NOT FLATCC_SCHEMA_FILES)
-        message(FATAL_ERROR "No flatbuffer definition files provided")
+        message(FATAL_ERROR "No flatbuffer schema files provided")
     endif()
 
     if (NOT FLATCC_OUTPUT_DIR)
@@ -123,17 +123,14 @@ function(flatcc_generate_sources)
 
     # Add current source directory for finding dependencies
     set(absolute_flatcc_paths "${CMAKE_CURRENT_SOURCE_DIR}")
-    # Also add directory of definition files
-    foreach(definition_file FLATCC_SCHEMA_FILES)
-    endforeach()
 
     set(ABSOLUTE_SCHEMA_FILES)
-    foreach(definition_file ${FLATCC_SCHEMA_FILES})
+    foreach(schema_file ${FLATCC_SCHEMA_FILES})
         # TODO: file(REAL_PATH) if cmake_minimum_required_version >= 3.19
-        if(IS_ABSOLUTE "${definition_file}")
-            set(absolute_def_file "${definition_file}")
+        if(IS_ABSOLUTE "${schema_file}")
+            set(absolute_def_file "${schema_file}")
         else()
-            set(absolute_def_file "${CMAKE_CURRENT_SOURCE_DIR}/${definition_file}")
+            set(absolute_def_file "${CMAKE_CURRENT_SOURCE_DIR}/${schema_file}")
         endif()
         list(APPEND ABSOLUTE_SCHEMA_FILES "${absolute_def_file}")
 
@@ -223,7 +220,6 @@ function(flatcc_generate_sources)
     endif()
 
     # Calculate suffixes of output files.
-
     set(GENERATED_FILE_SUFFIXES)
     if(FLATCC_READER)
         list(APPEND GENERATED_FILE_SUFFIXES _reader.h)
@@ -244,7 +240,7 @@ function(flatcc_generate_sources)
         list(APPEND GENERATED_FILE_SUFFIXES .bfbs)
     endif()
 
-    # grep each definition file recursively for includes, convert them to absolute paths and add them to a list
+    # grep each schema file recursively for includes, convert them to absolute paths and add them to a list
     set(ABSOLUTE_DEFINITIONS_DEPENDENCIES)
     set(absolute_schema_files_todo ${ABSOLUTE_SCHEMA_FILES})
     while(absolute_schema_files_todo)
@@ -295,9 +291,9 @@ function(flatcc_generate_sources)
         else()
             set(SCHEMA_FILES ${ABSOLUTE_SCHEMA_FILES})
         endif()
-        foreach(definition_file ${SCHEMA_FILES})
+        foreach(schema_file ${SCHEMA_FILES})
             # TODO: should be NAME_WLE, but not supported in cmake 2.8
-            get_filename_component(def_name_we "${definition_file}" NAME_WE)
+            get_filename_component(def_name_we "${schema_file}" NAME_WE)
             foreach(suffix ${GENERATED_FILE_SUFFIXES})
                 list(APPEND OUTPUT_FILES "${FLATCC_OUTPUT_DIR}/${def_name_we}${suffix}")
             endforeach()
