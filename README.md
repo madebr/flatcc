@@ -200,7 +200,7 @@ If your project uses the CMake build system, you can include the cmake module
        [READER] [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
        [OUTFILE <output-file>] [PREFIX <prefix>] [TARGET <target-name>]
        [PATHS <include-path> [<include-path> [...]]]
-       [COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]]
+       [EXTRA_ARGS <flatcc-flag> [<flatcc-flag> [...]]]
     )
 
 The following things are available:

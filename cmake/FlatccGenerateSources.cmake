@@ -10,7 +10,7 @@
 #      [VERIFIER] [JSON_PARSER] [JSON_PRINTER] [JSON] [RECURSIVE]
 #      [OUTFILE <output-file>] [PREFIX <prefix>]
 #      [PATHS <include-path> [<include-path> [...]]]
-#      [COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]]
+#      [EXTRA_ARGS <flatcc-flag> [<flatcc-flag> [...]]]
 #   )
 #
 # The following things are returned:
@@ -76,9 +76,10 @@
 #
 #     Add extra include search paths where flatcc should look for included defintion files.
 #
-#   COMPILE_FLAGS <flatcc-flag> [<flatcc-flag> [...]]
+#   EXTRA_ARGS <flatcc-arg> [<flatcc-arg> [...]]
 #
 #     Add extra arguments to flatcc.
+#     Use the arguments `ALL`/`COMMON`/`READER`/`JSON` instead of specifying `-a`/`-c`/`--reader`/`--json` here.
 #
 
 cmake_minimum_required(VERSION 3.3)
@@ -91,7 +92,7 @@ function(flatcc_generate_sources)
     set(output_options BINARY_SCHEMA COMMON COMMON_READER COMMON_BUILDER BUILDER READER VERIFIER JSON_PARSER JSON_PRINTER JSON)
     set(NO_VAL_ARGS ALL RECURSIVE ${output_options})
     set(SINGLE_VAL_ARGS NAME OUTPUT_DIR OUTFILE PREFIX)
-    set(MULTI_VAL_ARGS SCHEMA_FILES COMPILE_FLAGS PATHS)
+    set(MULTI_VAL_ARGS SCHEMA_FILES EXTRA_ARGS PATHS)
 
     cmake_parse_arguments(FLATCC "${NO_VAL_ARGS}" "${SINGLE_VAL_ARGS}" "${MULTI_VAL_ARGS}" ${ARGN})
     
@@ -119,7 +120,7 @@ function(flatcc_generate_sources)
         set(FLATCC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${FLATCC_OUTPUT_DIR}")
     endif()
 
-    list(APPEND FLATCC_COMPILE_FLAGS -o "${FLATCC_OUTPUT_DIR}")
+    list(APPEND FLATCC_ARGS -o "${FLATCC_OUTPUT_DIR}")
 
     # Add current source directory for finding dependencies
     set(absolute_flatcc_paths "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -144,7 +145,7 @@ function(flatcc_generate_sources)
             set(path "${CMAKE_CURRENT_SOURCE_DIR}/${path}")
         endif()
         list(APPEND absolute_flatcc_paths "${path}")
-        list(APPEND FLATCC_COMPILE_FLAGS -I "${path}")
+        list(APPEND FLATCC_ARGS -I "${path}")
     endforeach()
     list(REMOVE_DUPLICATES absolute_flatcc_paths)
 
@@ -162,55 +163,55 @@ function(flatcc_generate_sources)
     # Add flatcc options
 
     if(FLATCC_PREFIX)
-        list(APPEND FLATCC_COMPILE_FLAGS "--prefix=${FLATCC_PREFIX}")
+        list(APPEND FLATCC_ARGS "--prefix=${FLATCC_PREFIX}")
     endif()
 
     # Handle reader option first as other option encompass reader
     if (FLATCC_READER)
-        list(APPEND FLATCC_COMPILE_FLAGS --reader)
+        list(APPEND FLATCC_ARGS --reader)
     endif()
     if (FLATCC_COMMON_READER)
-        list(APPEND FLATCC_COMPILE_FLAGS --common)
+        list(APPEND FLATCC_ARGS --common)
     endif()
     if (FLATCC_COMMON_BUILDER)
-        list(APPEND FLATCC_COMPILE_FLAGS --common)
+        list(APPEND FLATCC_ARGS --common)
     endif()
     if (FLATCC_BUILDER)
-        list(APPEND FLATCC_COMPILE_FLAGS --builder)
+        list(APPEND FLATCC_ARGS --builder)
         # Builder also generates reader
         set(FLATCC_READER ON)
     endif()
     if (FLATCC_VERIFIER)
-        list(APPEND FLATCC_COMPILE_FLAGS --verifier)
+        list(APPEND FLATCC_ARGS --verifier)
         # verifier also generates reader
         set(FLATCC_READER ON)
     endif()
     if (FLATCC_JSON_PARSER)
-        list(APPEND FLATCC_COMPILE_FLAGS --json-parser)
+        list(APPEND FLATCC_ARGS --json-parser)
     endif()
     if (FLATCC_JSON_PRINTER)
-        list(APPEND FLATCC_COMPILE_FLAGS --json-printer)
+        list(APPEND FLATCC_ARGS --json-printer)
     endif()
     if (FLATCC_BINARY_SCHEMA)
-        list(APPEND FLATCC_COMPILE_FLAGS --schema)
+        list(APPEND FLATCC_ARGS --schema)
     endif()
     if (FLATCC_RECURSIVE)
-        list(APPEND FLATCC_COMPILE_FLAGS --recursive)
+        list(APPEND FLATCC_ARGS --recursive)
     endif()
 
     # handle 'all', 'common', 'json' last as they encompass other options
     if (FLATCC_COMMON)
-        list(APPEND FLATCC_COMPILE_FLAGS --common)
+        list(APPEND FLATCC_ARGS --common)
         set(FLATCC_COMMON_READER ON)
         set(FLATCC_COMMON_BUILDER ON)
     endif()
     if (FLATCC_JSON)
-        list(APPEND FLATCC_COMPILE_FLAGS --json)
+        list(APPEND FLATCC_ARGS --json)
         set(FLATCC_JSON_PARSER ON)
         set(FLATCC_JSON_PRINTER ON)
     endif()
     if (FLATCC_ALL)
-        list(APPEND FLATCC_COMPILE_FLAGS -a)
+        list(APPEND FLATCC_ARGS -a)
         set(FLATCC_COMMON_BUILDER ON)
         set(FLATCC_COMMON_READER ON)
         set(FLATCC_BUILDER ON)
@@ -283,7 +284,7 @@ function(flatcc_generate_sources)
 
     set(OUTPUT_FILES)
     if(FLATCC_OUTFILE)
-        list(APPEND FLATCC_COMPILE_FLAGS "--outfile=${FLATCC_OUTPUT_DIR}/${FLATCC_OUTFILE}")
+        list(APPEND FLATCC_ARGS "--outfile=${FLATCC_OUTPUT_DIR}/${FLATCC_OUTFILE}")
         list(APPEND OUTPUT_FILES "${FLATCC_OUTPUT_DIR}/${FLATCC_OUTFILE}")
     else()
         if(FLATCC_RECURSIVE)
@@ -307,12 +308,14 @@ function(flatcc_generate_sources)
         endif()
     endif()
 
+    set(FLATCC_ARGS ${FLATCC_EXTRA_ARGS})
+
     # TODO: VERBOSE was added in cmake 3.15.
     if(NOT (CMAKE_VERSION VERSION_LESS 3.15))
         message(VERBOSE "---- flatcc info start ----")
         message(VERBOSE "output directory: ${FLATCC_OUTPUT_DIR}")
         message(VERBOSE "output files: ${OUTPUT_FILES}")
-        message(VERBOSE "execute: flatcc;${FLATCC_COMPILE_FLAGS};${ABSOLUTE_SCHEMA_FILES}")
+        message(VERBOSE "execute: flatcc;${FLATCC_ARGS};${ABSOLUTE_SCHEMA_FILES}")
         message(VERBOSE "dependencies: ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}")
         message(VERBOSE "----- flatcc info end -----")
     endif()
@@ -321,7 +324,7 @@ function(flatcc_generate_sources)
 
     add_custom_command(OUTPUT ${OUTPUT_FILES}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${FLATCC_OUTPUT_DIR}"
-        COMMAND flatcc::cli ${FLATCC_COMPILE_FLAGS} ${ABSOLUTE_SCHEMA_FILES}
+        COMMAND flatcc::cli ${FLATCC_ARGS} ${ABSOLUTE_SCHEMA_FILES}
         DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
 
