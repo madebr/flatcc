@@ -7,16 +7,31 @@ jobs:
     if: ${{ github.ref != 'refs/heads/ci-more' }}
     strategy:
       matrix:
-        os: ['macos-latest', 'ubuntu-latest']
-        config: ['Release', 'Debug']
-        cmake_generator: ['Unix Makefiles']
         include:
+          - os: 'ubuntu-latest'
+            config: 'Release'
+            cmake_generator: 'Unix Makefiles'
+            shared: 'OFF'
+          - os: 'ubuntu-latest'
+            config: 'Debug'
+            cmake_generator: 'Ninja'
+            shared: 'OFF'
+          - os: 'ubuntu-latest'
+            config: 'Release'
+            cmake_generator: 'Unix Makefiles'
+            shared: 'ON'
+          - os: 'macos-latest'
+            config: 'Release'
+            cmake_generator: 'Unix Makefiles'
+            shared: 'OFF'
+          - os: 'macos-latest'
+            config: 'Debug'
+            cmake_generator: 'Ninja'
+            shared: 'OFF'
           - os: 'macos-latest'
             config: 'Release'
             cmake_generator: 'Ninja'
-          - os: 'ubuntu-latest'
-            config: 'Release'
-            cmake_generator: 'Ninja'
+            shared: 'ON'
     runs-on: ${{ matrix.os }}
     steps:
       - name: 'Checkout repo'
@@ -33,7 +48,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "${{ matrix.cmake_generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix
+          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -G "${{ matrix.cmake_generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix
       - name: 'CMake build'
         run: |
           cmake --build build --parallel
