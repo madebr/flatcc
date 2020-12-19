@@ -11,6 +11,7 @@ target_include_directories(flatcc_cli PRIVATE "${PROJECT_SOURCE_DIR}/config")
 set_target_properties(flatcc_cli PROPERTIES
     OUTPUT_NAME flatcc
     EXPORT_NAME cli
+    INSTALL_RPATH $ORIGIN/../${lib_dir}
 )
 if(NOT (CMAKE_VERSION VERSION_LESS 3.4))
     # TODO: cmake versions <3.4 do not support generator expressions in OUTPUT_NAME
