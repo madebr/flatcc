@@ -309,6 +309,14 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_EXECUTABLE_SUFFIX "_d${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
 
+if(BUILD_SHARED_LIBS)
+    if(APPLE)
+        set(CMAKE_INSTALL_RPATH "@executable_path/../${lib_dir}")
+        set(CMAKE_MACOSX_RPATH 1)
+    elseif(UNIX)
+        set(CMAKE_INSTALL_RPATH "$ORIGIN/../${lib_dir}")
+    endif()
+endif()
 
 if (FLATCC_RTONLY)
     # The targets we copy to bin and lib directories, i.e. not tests.

@@ -19,17 +19,6 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.4))
     )
 endif()
 
-if(BUILD_SHARED_LIBS)
-    if(APPLE)
-        set_target_properties(flatcc_cli PROPERTIES
-            MACOSX_RPATH 1
-            INSTALL_RPATH "@executable_path/../${lib_dir}"
-        )
-    elseif(UNIX)
-        set_property(TARGET flatcc_cli PROPERTY INSTALL_RPATH "$ORIGIN/../${lib_dir}")
-    endif()
-endif()
-
 if (FLATCC_INSTALL)
     install(TARGETS flatcc_cli EXPORT flatcc_cli_exports DESTINATION bin)
 endif()
