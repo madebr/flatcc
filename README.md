@@ -483,7 +483,7 @@ uses C99 style code to better follow the C++ version.
 
 The build option `FLATCC_TEST` can be used to disable all tests which
 might make flatcc compile on platforms that are otherwise problematic.
-The buld option `FLATCC_CXX_TEST` can be disabled specifically for C++
+The build option `FLATCC_CXX_TEST` can be disabled specifically for C++
 tests (a simple C++ file that includes generated C code).
 
 ### Platforms reported to work by users

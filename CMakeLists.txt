@@ -12,11 +12,12 @@ option(FLATCC_TEST "enable tests" ON)
 # Only active if FLATCC_TEST is active. Used to ensure that C++ users
 # can include generatd C source. Old GCC pre 4.7 won't compile C++ test
 # project.
-option(FLATCC_CXX_TEST "enable C++ tests" ON)
+include(CMakeDependentOption)
+cmake_dependent_option(FLATCC_CXX_TEST "enable C++ tests" ON FLATCC_TEST OFF)
 
 # Conditionally set project languages based on FLATCC_TEST, as C++ is
 # only necessary if building the tests.
-if (FLATCC_TEST AND FLATCC_CXX_TEST)
+if (FLATCC_CXX_TEST)
     project (FlatCC C CXX)
 else()
     project (FlatCC C)
@@ -108,10 +109,6 @@ option (FLATCC_IGNORE_CONST_COND "silence const condition warnings" OFF)
 
 if (FLATCC_RTONLY)
     set(FLATCC_TEST off)
-endif()
-
-if (FLATCC_TEST)
-    enable_testing()
 endif()
 
 if (NOT FLATCC_TEST)
@@ -337,6 +334,7 @@ endif()
 
 # disabled by FLATCC_RTONLY
 if (FLATCC_TEST)
+    enable_testing()
     add_subdirectory(test)
     add_subdirectory(samples)
 endif()
