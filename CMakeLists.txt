@@ -276,7 +276,7 @@ elseif (MSVC) # using STREQUAL here conflicts with string interpretation changes
         set (FLATCC_NEED_C89_VAR_DECLS true)
     endif()
     set(FLATCC_PORTABLE true)
- elseif (CMAKE_C_COMPILER_ID STREQUAL "XL")
+elseif (CMAKE_C_COMPILER_ID STREQUAL "XL")
     # IBM's native XLC C compiler in extended C99 mode
 
     message(STATUS "Setting IBM XL C compiler options")
