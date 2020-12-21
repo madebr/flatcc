@@ -825,8 +825,8 @@ Example:
     target_link_libraries(seclif_protocol PRIVATE flatcc::runtime flatcc_generated::seclif_protocol)
 
 Cross building with flatbuffers on cmake is possible by providing the install 
-location of the build architecture flatcc package via environment variable
-flatccCli_ROOT or via cmake variable flatccCli_ROOT. The flatcc_generate_sources
+location of the build architecture flatcc package via the cmake variable `FLATCC_ROOT_FOR_BUILD`
+or environment variable `FLATCC_ROOT_FOR_BUILD`. The flatcc_generate_sources
 function will then use the *build* architecture flatcc cli executable to
 generate the header files and link your target to the *host* architecture
 libflatccrt library. See section [Cross-compilation](#cross-compilation) for an example.
@@ -2362,32 +2362,31 @@ Docker image:
 Cross-compilation is possible when using the CMake build system. First you have
 to build and install flatcc for the build architecture. Then when cross-compiling
 provide the install location of the build architecture flatcc package via
-environment variable `flatccCli_ROOT` or via cmake variable `flatccCli_ROOT`.
+environment variable `FLATCC_ROOT_FOR_BUILD` or via cmake variable `FLATCC_ROOT_FOR_BUILD`.
 
-The tests cannot be run because they are compiled for the host architecture and
-thus cannot run on the build machine, so build with cmake option `FLATCC_TEST` disabled.
+It is possible to build the tests for your target system, but not to run them on the build system, unless you've configured
+[`CMAKE_CROSSCOMPILING_EMULATOR`](https://cmake.org/cmake/help/latest/variable/CMAKE_CROSSCOMPILING_EMULATOR.html).
 The option `FLATCC_RTONLY` will disable tests and only build the runtime library.
-It is highly recommended to at least run the `tests/monster_test`
-project on a new platform.
+It is highly recommended to at least run the `tests/monster_test` project on your target platform.
 
 
 The following may be a starting point:
 
     mkdir -p build/buildarch && cd build/buildarch
-    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/my/install/dir/flatcc_x86_64 -DFLATCC_INSTALL=On
+    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/my/install/dir/flatcc_x86_64 -DFLATCC_INSTALL=ON
     cmake --build .
     cmake --build . --target install
     cd ..
 
     <activate cross-compile toolchain>
     mkdir hostarch && cd hostarch
-    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=</path/to/your_cross_compile_toolchain_file> -DCMAKE_INSTALL_PREFIX=/my/install/dir/flatcc_cortexa9 -DFLATCC_INSTALL=On -DFLATCC_TEST=Off
+    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=</path/to/your_cross_compile_toolchain_file> -DCMAKE_INSTALL_PREFIX=/my/install/dir/flatcc_cortexa9 -DFLATCC_ROOT_FOR_BUILD=/my/install/dir/flatcc_x86_64 -DFLATCC_INSTALL=ON
     cmake --build .
     cmake --build . --target install
 
     cd </path/to/your/project/using/flatcc>
     mkdir -p build/cortexa9 && cd build/cortexa9
-    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=<path/to/your_cross_compile_toolchain_file> -DCMAKE_PREFIX_PATH=/my/install/dir/flatcc_cortexa9 -DflatccCli_ROOT=/my/install/dir/flatcc_x86_64
+    cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=<path/to/your_cross_compile_toolchain_file> -DCMAKE_PREFIX_PATH=/my/install/dir/flatcc_cortexa9 -DFLATCC_ROOT_FOR_BUILD=/my/install/dir/flatcc_x86_64
     cmake --build .
 
 Note that flatcc is also available as a [Conan](https://conan.io) package in [conan-center](https://conan.io/center). This can simplify cross-
