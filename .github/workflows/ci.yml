@@ -48,7 +48,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -G "${{ matrix.cmake_generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix
+          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -G "${{ matrix.cmake_generator }}" \
+              -DCMAKE_BUILD_TYPE=${{ matrix.config }} -DFLATCC_INSTALL=ON \
+              -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix
       - name: 'CMake build'
         run: |
           cmake --build build --parallel
@@ -94,6 +96,52 @@ jobs:
       - name: 'Test installed flatcc prefix'
         run: |
           mkdir user && cd user
-          cmake "${{ github.workspace }}/test/install_test" -A ${{ matrix.arch }} -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prefix"
+          cmake "${{ github.workspace }}/test/install_test" -A ${{ matrix.arch }} `
+              -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prefix"
           cmake --build . --config ${{ matrix.config }}
           ctest . -C ${{ matrix.config }}
+  test_mingw_on_linux:
+    name: 'Test cross building to Windows with CMake'
+    if: ${{ github.ref != 'refs/heads/ci-more' }}
+    strategy:
+      matrix:
+        config: ['Release']
+        arch: ['x64']
+        shared_build: ['ON']
+        config_build: ['Release']
+        shared_host: ['ON']
+        config_host: ['Release']
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Install mingw'
+        run: |
+          sudo apt-get install mingw-w64
+      - name: 'Checkout repo'
+        uses: actions/checkout@v2
+      - name: 'CMake configure/build/install build flatcc (native)'
+        run: |
+          mkdir build_native
+          cd build_native
+          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared_build }} -DCMAKE_BUILD_TYPE=${{ matrix.config_build }} \
+              -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix_build
+          cmake --build . --parallel
+          cmake --build . --target install
+      - name: 'CMake configure/build/install host flatcc (cross)'
+        run: |
+          mkdir build_mingw
+          cd build_mingw
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/x86_64-w64-mingw32-toolchain.cmake -DFLATCC_ALLOW_WERROR=OFF \
+              -DBUILD_SHARED_LIBS=${{ matrix.shared_host }} -DFLATCC_INSTALL=ON \
+              -DCMAKE_BUILD_TYPE=${{ matrix.config_host }} \
+              -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/prefix_host \
+              -DFLATCC_ROOT_FOR_BUILD=${{ github.workspace }}/prefix_build
+          cmake --build . --parallel
+          cmake --build . --target install
+      - name: 'Build a flatbuffers project with both native and host flatcc'
+        run: |
+          mkdir project
+          cd project
+          cmake ../test/install_test -DCMAKE_TOOLCHAIN_FILE=../cmake/x86_64-w64-mingw32-toolchain.cmake \
+              -DCMAKE_PREFIX_PATH=${{ github.workspace }}/prefix_host \
+              -DFLATCC_ROOT_FOR_BUILD=${{ github.workspace }}/prefix_build
+          cmake --build .

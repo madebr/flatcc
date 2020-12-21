@@ -324,8 +324,8 @@ function(flatcc_generate_sources)
 
     add_custom_command(OUTPUT ${OUTPUT_FILES}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${FLATCC_OUTPUT_DIR}"
-        COMMAND flatcc::cli ${FLATCC_ARGS} ${ABSOLUTE_SCHEMA_FILES}
-        DEPENDS flatcc::cli ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
+        COMMAND flatcc::cli_native ${FLATCC_ARGS} ${ABSOLUTE_SCHEMA_FILES}
+        DEPENDS flatcc::cli_native ${ABSOLUTE_DEFINITIONS_DEPENDENCIES}
     )
 
     add_custom_target("flatcc_generated_${FLATCC_NAME}"
@@ -338,3 +338,27 @@ function(flatcc_generate_sources)
     add_library("flatcc_generated::${FLATCC_NAME}" ALIAS "__flatcc_generated_${FLATCC_NAME}")
     set("${FLATCC_NAME}_GENERATED_SOURCES" ${OUTPUT_FILES} PARENT_SCOPE)
 endfunction()
+
+if(NOT TARGET flatcc::cli_native)
+    if(CMAKE_CROSSCOMPILING)
+        find_program(FLATCC_BIN
+            NAMES flatcc flatcc_d
+            PATHS "${FLATCC_ROOT_FOR_BUILD}" ENV FLATCC_ROOT_FOR_BUILD
+            PATH_SUFFIXES bin
+            DOC "Path of native flatcc executable"
+        )
+        if(NOT FLATCC_BIN)
+            message(FATAL_ERROR "Could not find native flatcc executable.")
+        endif()
+        add_executable(flatcc::cli_native IMPORTED)
+        set_property(TARGET flatcc::cli_native PROPERTY IMPORTED_LOCATION "${FLATCC_BIN}")
+    else()
+        #add_executable(flatcc::cli_native ALIAS flatcc::cli)
+        get_property(_flatcc_cli_alias TARGET flatcc::cli PROPERTY ALIASED_TARGET)
+        if(_flatcc_cli_alias)
+            add_executable(flatcc::cli_native ALIAS ${_flatcc_cli_alias})
+        else()
+            add_executable(flatcc::cli_native ALIAS flatcc::cli)
+        endif()
+    endif()
+endif()
