@@ -34,7 +34,7 @@ executable also handle optional json parsing or printing in less than 2 us for a
   * [Use of Macros in Generated Code](#use-of-macros-in-generated-code)
   * [Extracting Documentation](#extracting-documentation)
 * [Using flatcc](#using-flatcc)
-  *   [Using flatcc in CMake projects](#using-flatcc-in-your-cmake-projects)
+  *   [Using flatcc in CMake projects](#using-flatcc-in-cmake-projects)
 * [Trouble Shooting](#trouble-shooting)
 * [Quickstart](#quickstart)
   * [Reading a Buffer](#reading-a-buffer)
