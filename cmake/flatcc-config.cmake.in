@@ -2,6 +2,11 @@
 
 cmake_minimum_required(VERSION 3.3)
 
+#Don't complain about use of <PackageName>_ROOT to override find_package search location
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 if(NOT flatcc_FIND_COMPONENTS)
     set(flatcc_FIND_COMPONENTS cli runtime)
 endif()
@@ -36,6 +41,36 @@ if("cli" IN_LIST flatcc_FIND_COMPONENTS)
     endif()
     find_package(flatccCli ${fp_args} ${fp_cli_args})
     set(flatcc_cli_FOUND ${flatccCli_FOUND})
+    #find_package will skip the flatccCli_ROOT locations if they are in a different architecture.
+    #But for cross-compiling we actually need the flatcc cli executable in a different architecture.
+    set(FLATCC_EXTERNAL_CLI_EXE)
+    if (flatccCli_ROOT)
+        if(NOT EXISTS "${flatccCli_ROOT}/bin/flatcc")
+            message(WARNING "Flatcc compiler not found in alternative CLI location provided via flatccCli_ROOT")
+        else()
+            set(FLATCC_EXTERNAL_CLI_EXE ${flatccCli_ROOT}/bin/flatcc)
+        endif()
+    elseif($ENV{flatccCli_ROOT})        
+        if(NOT EXISTS "$ENV{flatccCli_ROOT}/${CMAKE_INSTALL_BINDIR}/flatcc")
+            message(WARNING "Flatcc compiler not found in alternative CLI location provided via environment variable flatccCli_ROOT")
+        else()
+            set(FLATCC_EXTERNAL_CLI_EXE $ENV{flatccCli_ROOT}/${CMAKE_INSTALL_BINDIR}/flatcc)
+        endif()
+    endif()
+    
+    if (FLATCC_EXTERNAL_CLI_EXE)
+        set_target_properties(flatcc::cli PROPERTIES
+                IMPORTED_LOCATION_RELEASE "${flatccCli_ROOT}/bin/flatcc"
+        )
+        foreach(NEXTCONFIG IN LISTS CMAKE_CONFIGURATION_TYPES)
+            if(NOT NEXTCONFIG STREQUAL "Release")
+                STRING(TOUPPER "${NEXTCONFIG}" CONFIGUPPER)
+                set_target_properties(flatcc::cli PROPERTIES
+                    MAP_IMPORTED_CONFIG_${CONFIGUPPER} Release
+                )
+            endif()
+        endforeach()
+    endif()
 endif()
 
 check_required_components(flatcc)
