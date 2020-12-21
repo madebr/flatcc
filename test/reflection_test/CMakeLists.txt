@@ -11,4 +11,4 @@ flatcc_generate_sources(
 add_executable(reflection_test reflection_test.c)
 target_link_libraries(reflection_test PRIVATE flatcc::runtime flatcc_generated::reflection_test)
 
-add_test(NAME reflection_test COMMAND reflection_test)
+flatcc_add_test(NAME reflection_test COMMAND $<TARGET_FILE:reflection_test>)

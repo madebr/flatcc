@@ -1,0 +1,3 @@
+JSON parse test
+monsterdata_test.golden: successfully parsed 49 lines
+input size: 701, output size: 288

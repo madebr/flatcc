@@ -12,4 +12,4 @@ flatcc_generate_sources(
 add_executable(optional_scalars_test optional_scalars_test.c)
 target_link_libraries(optional_scalars_test PRIVATE flatcc::runtime flatcc_generated::optional_scalars_test)
 
-add_test(NAME optional_scalars_test COMMAND optional_scalars_test)
+flatcc_add_test(NAME optional_scalars_test COMMAND $<TARGET_FILE:optional_scalars_test>)

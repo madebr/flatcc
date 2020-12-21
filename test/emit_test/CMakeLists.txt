@@ -11,4 +11,4 @@ flatcc_generate_sources(
 add_executable(emit_test emit_test.c)
 target_link_libraries(emit_test PRIVATE flatcc::runtime flatcc_generated::emit_test)
 
-add_test(NAME emit_test COMMAND emit_test)
+flatcc_add_test(NAME emit_test COMMAND $<TARGET_FILE:emit_test>)

@@ -1,0 +1,3 @@
+schema is valid!
+now generating code for C ...
+

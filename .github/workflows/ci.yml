@@ -55,7 +55,7 @@ jobs:
       - name: 'CTest'
         run: |
           cd build
-          ctest -V -C ${{ matrix.config }}
+          ctest -C ${{ matrix.config }} --output-on-failure
       - name: 'Install'
         run: |
           cmake --build build --target install
@@ -87,7 +87,7 @@ jobs:
       - name: 'CTest'
         run: |
           cd build
-          ctest -V -C ${{ matrix.config }}
+          ctest -C ${{ matrix.config }} --output-on-failure
       - name: 'Install'
         run: |
           cmake --build build --target install --config ${{ matrix.config }}

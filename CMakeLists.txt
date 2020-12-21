@@ -335,6 +335,7 @@ endif()
 # disabled by FLATCC_RTONLY
 if (FLATCC_TEST)
     enable_testing()
+    include(flatccTests)
     add_subdirectory(test)
     add_subdirectory(samples)
 endif()

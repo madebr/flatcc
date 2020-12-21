@@ -11,4 +11,4 @@ flatcc_generate_sources(
 add_executable(monster_test monster_test.c)
 target_link_libraries(monster_test PRIVATE flatcc::runtime flatcc_generated::monster_test)
 
-add_test(NAME monster_test COMMAND monster_test)
+flatcc_add_test(NAME monster_test COMMAND $<TARGET_FILE:monster_test>)

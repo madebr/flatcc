@@ -11,5 +11,5 @@ flatcc_generate_sources(
 add_executable(load_test load_test.c)
 target_link_libraries(load_test PRIVATE flatcc::runtime flatcc_generated::load_test)
 
-add_test(NAME load_test COMMAND load_test)
+flatcc_add_test(NAME load_test TIMEOUT 10 NOREF COMMAND $<TARGET_FILE:load_test>)
 

@@ -20,4 +20,4 @@ flatcc_generate_sources(
 add_executable(bfbs2json bfbs2json.c)
 target_link_libraries(bfbs2json PRIVATE flatcc::runtime flatcc_generated::reflection_sample)
 
-add_test(NAME bfbs2json COMMAND bfbs2json "${GEN_DIR}/monster.bfbs")
+flatcc_add_test(NAME bfbs2json COMMAND $<TARGET_FILE:bfbs2json> "${GEN_DIR}/monster.bfbs")

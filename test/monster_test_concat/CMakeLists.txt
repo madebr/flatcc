@@ -12,4 +12,4 @@ flatcc_generate_sources(
 add_executable(monster_test_concat monster_test_concat.c)
 target_link_libraries(monster_test_concat PRIVATE flatcc::runtime flatcc_generated::monster_test_concat)
 
-add_test(NAME monster_test_concat COMMAND monster_test_concat)
+flatcc_add_test(NAME monster_test_concat COMMAND $<TARGET_FILE:monster_test_concat>)

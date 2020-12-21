@@ -1,0 +1,4 @@
+running debug monster test
+dbg: struct buffer size: 48
+Monster not available
+dbg: struct buffer size: 48

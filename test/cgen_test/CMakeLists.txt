@@ -6,7 +6,7 @@ target_link_libraries(cgen_test
     flatcc::compiler
 )
 
-add_test(NAME cgen_test COMMAND cgen_test)
+flatcc_add_test(NAME cgen_test COMMAND $<TARGET_FILE:cgen_test>)
 
 
 if(CMAKE_VERSION VERSION_LESS 3.10)
@@ -43,5 +43,5 @@ else()
         COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}" --target test_generated_objects --config $<CONFIG> --verbose
     )
 
-    add_test(NAME test_generated COMMAND ${CMAKE_COMMAND} --build "${PROJECT_BINARY_DIR}" --target test_generated --config $<CONFIG>)
+    flatcc_add_test(NAME test_generated NOREF TIMEOUT 10 COMMAND ${CMAKE_COMMAND} --build "${PROJECT_BINARY_DIR}" --target test_generated --config $<CONFIG>)
 endif()

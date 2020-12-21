@@ -16,4 +16,4 @@ add_custom_command (
     COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/monsterdata_test.mon" "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-add_test(NAME flatc_compat COMMAND flatc_compat)
+flatcc_add_test(NAME flatcc_compat COMMAND $<TARGET_FILE:flatc_compat>)

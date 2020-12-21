@@ -29,10 +29,10 @@ target_link_libraries(test_json_parser PRIVATE flatcc::runtime flatcc_generated:
 target_link_libraries(test_json_printer PRIVATE flatcc::runtime flatcc_generated::json_test )
 target_link_libraries(test_json PRIVATE flatcc::runtime flatcc_generated::json_test )
 
-add_test(NAME test_basic_parse COMMAND test_basic_parse)
-add_test(NAME test_json_parser COMMAND test_json_parser)
-add_test(NAME test_json_printer COMMAND test_json_printer)
-add_test(NAME test_json COMMAND test_json)
+flatcc_add_test(NAME test_basic_parse COMMAND $<TARGET_FILE:test_basic_parse>)
+flatcc_add_test(NAME test_json_parser COMMAND $<TARGET_FILE:test_json_parser>)
+flatcc_add_test(NAME test_json_printer COMMAND $<TARGET_FILE:test_json_printer>)
+flatcc_add_test(NAME test_json COMMAND $<TARGET_FILE:test_json>)
 
 # Compile without default library in order to test various runtime flags
 set(RTPATH "${PROJECT_SOURCE_DIR}/src/runtime")
@@ -49,7 +49,7 @@ macro(jstest trg flags)
     add_executable(${trg} test_json.c ${RTSRC})
     target_link_libraries(${trg} PRIVATE flatcc_generated::json_test)
     target_include_directories(${trg} PRIVATE ${PROJECT_SOURCE_DIR}/include)
-    add_test(NAME ${trg} COMMAND ${trg})
+    flatcc_add_test(NAME ${trg} COMMAND $<TARGET_FILE:${trg}>)
     set_target_properties(${trg} PROPERTIES COMPILE_FLAGS ${flags})
 endmacro()
 

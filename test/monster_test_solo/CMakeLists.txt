@@ -16,4 +16,4 @@ add_executable(monster_test_solo monster_test_solo.c "${GEN_DIR}/monster_test.h"
 target_include_directories(monster_test_solo PRIVATE "${GEN_DIR}")
 target_link_libraries(monster_test_solo flatcc::runtime)
 
-add_test(NAME monster_test_solo COMMAND monster_test_solo)
+flatcc_add_test(NAME monster_test_solo COMMAND $<TARGET_FILE:monster_test_solo>)

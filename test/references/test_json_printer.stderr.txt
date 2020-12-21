@@ -1,0 +1,2 @@
+running json print test
+json print test succeeded
