@@ -20,5 +20,5 @@ if(NOT (CMAKE_VERSION VERSION_LESS 3.4))
 endif()
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatcc_cli EXPORT flatcc_cli_exports DESTINATION bin)
+    install(TARGETS flatcc_cli EXPORT flatcc_cli_exports DESTINATION "${CMAKE_INSTALL_BINDIR}")
 endif()

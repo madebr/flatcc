@@ -45,5 +45,9 @@ target_include_directories(flatcc
 set_target_properties(flatcc PROPERTIES EXPORT_NAME compiler)
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatcc EXPORT flatcc_runtime_exports DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS flatcc EXPORT flatcc_runtime_exports
+        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    )
 endif()

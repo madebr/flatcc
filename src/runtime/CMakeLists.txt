@@ -14,5 +14,9 @@ set_target_properties(flatccrt PROPERTIES
     EXPORT_NAME runtime)
 
 if (FLATCC_INSTALL)
-    install(TARGETS flatccrt EXPORT flatcc_runtime_exports DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS flatccrt EXPORT flatcc_runtime_exports
+        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        RUNTIME DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
+    )
 endif()
