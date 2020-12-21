@@ -314,6 +314,10 @@ if(BUILD_SHARED_LIBS)
     endif()
 endif()
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_BINDIR}")
+
 if (FLATCC_RTONLY)
     # The targets we copy to bin and lib directories, i.e. not tests.
     set(dist_targets
@@ -344,13 +348,6 @@ if (FLATCC_COVERAGE)
         COMMAND lcov --capture --directory src --output-file coverage.info
         COMMAND genhtml coverage.info --output-directory coverage)
 endif()
-
-set_target_properties(${dist_targets}
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${dist_dir}/${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME_OUTPUT_DIRECTORY "${dist_dir}/bin"
-)
 
 if (FLATCC_INSTALL)
     install(DIRECTORY include/flatcc DESTINATION include)
