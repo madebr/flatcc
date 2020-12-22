@@ -25,7 +25,7 @@ jobs:
           cd build
           cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} `
               -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/prefix" `
-              -G "MinGW Makefiles"
+              -G "MinGW Makefiles" -DCMAKE_C_FLAGS="-Wno-pedantic-ms-format" -DCMAKE_CXX_FLAGS="-Wno-pedantic-ms-format"
       - name: 'CMake build'
         run: |
           cmake --build build --parallel
