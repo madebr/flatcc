@@ -28,7 +28,6 @@ jobs:
           cd build
           cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
               -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="$(cygpath -u "${{ github.workspace }}/prefix")" \
-              -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
               -G "MinGW Makefiles"
       - name: 'CMake build'
         run: |
@@ -43,7 +42,9 @@ jobs:
       - name: 'Test installed flatcc prefix'
         run: |
           mkdir user && cd user
-          cmake "${{ github.workspace }}/test/install_test" -DCMAKE_PREFIX_PATH="$(cygpath -u "${{ github.workspace }}/prefix")" \
-              -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -G "MinGW Makefiles"
+          cmake "${{ github.workspace }}/test/install_test" \
+              -DCMAKE_PREFIX_PATH="$(cygpath -u "${{ github.workspace }}/prefix")" -G "MinGW Makefiles"
           cmake --build .
           ctest .
+        env:
+          PATH: '${{ github.workspace }}\prefix\bin'
