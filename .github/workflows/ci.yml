@@ -14,8 +14,8 @@ jobs:
       - name: 'Setup mingw'
         uses: 'msys2/setup-msys2@v2'
         with:
-          install: mingw-w64-x86_64-cmake mingw-w64-x86_64-toolchain sed
-      - name: 'Checkout repo'
+          install: mingw-w64-x86_64-toolchain sed
+      - name: 'Checkout repo' # mingw-w64-x86_64-cmake 
         uses: actions/checkout@v2
       - name: 'CMake --help'
         run: cmake --help
@@ -23,8 +23,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
-              -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/prefix" \
+          cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} `
+              -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/prefix" `
               -G "MinGW Makefiles"
       - name: 'CMake build'
         run: |
@@ -39,7 +39,7 @@ jobs:
       - name: 'Test installed flatcc prefix'
         run: |
           mkdir user && cd user
-          cmake "${{ github.workspace }}/test/install_test" \
+          cmake "${{ github.workspace }}/test/install_test" `
               -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prefix" -G "MinGW Makefiles"
           cmake --build .
           ctest .
