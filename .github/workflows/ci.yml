@@ -10,9 +10,6 @@ jobs:
         shared: ['ON', 'OFF']
         config: ['Release']
     runs-on: 'windows-latest'
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
       - name: 'Setup mingw'
         uses: 'msys2/setup-msys2@v2'
@@ -27,7 +24,7 @@ jobs:
           mkdir build
           cd build
           cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
-              -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="$(cygpath -u "${{ github.workspace }}/prefix")" \
+              -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/prefix" \
               -G "MinGW Makefiles"
       - name: 'CMake build'
         run: |
@@ -43,8 +40,8 @@ jobs:
         run: |
           mkdir user && cd user
           cmake "${{ github.workspace }}/test/install_test" \
-              -DCMAKE_PREFIX_PATH="$(cygpath -u "${{ github.workspace }}/prefix")" -G "MinGW Makefiles"
+              -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prefix" -G "MinGW Makefiles"
           cmake --build .
           ctest .
         env:
-          PATH: '${{ github.workspace }}\prefix\bin'
+          PATH: '${{ github.workspace }}/prefix/bin'
