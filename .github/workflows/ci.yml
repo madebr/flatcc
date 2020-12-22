@@ -11,21 +11,16 @@ jobs:
         config: ['Release']
     runs-on: 'windows-latest'
     steps:
-      - name: 'Setup mingw'
-        uses: 'msys2/setup-msys2@v2'
-        with:
-          install: mingw-w64-x86_64-toolchain sed
-      - name: 'Checkout repo' # mingw-w64-x86_64-cmake 
+      - name: 'Checkout repo'
         uses: actions/checkout@v2
-      - name: 'CMake --help'
-        run: cmake --help
       - name: 'CMake configure'
         run: |
           mkdir build
           cd build
           cmake .. -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DCMAKE_BUILD_TYPE=${{ matrix.config }} `
               -DFLATCC_INSTALL=ON -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/prefix" `
-              -G "MinGW Makefiles" -DCMAKE_C_FLAGS="-Wno-pedantic-ms-format" -DCMAKE_CXX_FLAGS="-Wno-pedantic-ms-format"
+              -G "MinGW Makefiles"
+          # -DCMAKE_C_FLAGS="-Wno-pedantic-ms-format" -DCMAKE_CXX_FLAGS="-Wno-pedantic-ms-format"
       - name: 'CMake build'
         run: |
           cmake --build build --parallel
@@ -38,10 +33,9 @@ jobs:
           cmake --build build --target install
       - name: 'Test installed flatcc prefix'
         run: |
+          $env:Path += ";${{ github.workspace }}/prefix/bin"
           mkdir user && cd user
           cmake "${{ github.workspace }}/test/install_test" `
               -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prefix" -G "MinGW Makefiles"
           cmake --build .
           ctest .
-        env:
-          PATH: '${{ github.workspace }}/prefix/bin'
